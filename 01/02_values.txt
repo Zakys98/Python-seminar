@@ -1,0 +1,73 @@
+## Values and Objects
+
+When talking about data, it might be tempting to start with
+variables, but this is usually a mistake: first, we need to talk
+about «values» and «cells»¹. Because right at the start, there are
+some problems to resolve and they generally revolve about
+«identity».
+
+What is a value? Well, ‹1› is a value. Or ‹0›, or ‹2›, or ‹(0, 1)›,
+or ‹None›, or ‹[1, 2, 3]›, or ‹"hello"›, or any number of other
+things. What have all those things in common? First of all, they can
+all be «stored in memory» – at least for now, we will not worry
+about bits and bytes, just that a value is a piece of data that can
+be remembered (it doesn't even need to be in computer memory, you
+can remember them in your head).
+
+What else can we do with values, other than remember them? We can
+perform operations on them: ‹1 + 1› is ‹2›, ‹"hello" + " " +
+"world"› is ‹"hello world"› and so on. Clearly, taking some values
+and performing operations on them produces new values. Imagine that
+we had ‹1› and then some other ‹1› – if we were to compute ‹1 + 2›,
+does it make a difference which one do we use? Obviously, it does
+not. Equal values are interchangeable: replacing ‹1› with another
+‹1› will not change a program in any way. Values do not have an
+«identity».
+
+What is identity? Now that is a complicated philosophical question
+(no, really, it's been debated for well over 2 millennia).²
+Fortunately for us, it is much easier for us: an «cell» is
+«created», then it is «alive» for a while and at some point it is
+«destroyed». The identity of a cell is fixed (once created, it is
+always the same cell) and no two cells have the same identity.³ It
+does not matter how much we «change» the cells (the technical term
+is «mutate»), it is still the same cell. And it is still different
+from all other cells.
+
+So what is the relationship between «cells» and «values»? In a
+nutshell, a cell combines a «value» with an «identity». There are
+two cases where the identity becomes important:
+
+ 1. the behaviour of the program can directly or indirectly depend
+    on the identity of a cell (e.g. by using an ‘are these cells the
+    same’ operator, which is available in Python as ‹foo is bar›),
+ 2. a value associated with a cell can change, i.e. the cell is
+    «mutable» (in Python, this depends on the «type» of the cell:
+    some are mutable, but some are immutable).
+
+Out of these two, the latter is quite clearly much more important:
+in fact, the former rarely makes sense in the absence of the latter.
+Cell «identity» is only important in the presence of cell
+«mutability». For «immutable» cells, we prefer to talk and think
+about «values» and disregard that they are perhaps associated with
+some cells (since the only other property of the cells, their
+identity, we do not care about).
+
+¹ Terminology is hard. We could use «object» for what we call «cell»
+  here, perhaps more intuitively, but that conflicts with the
+  «other» meaning of the word ‘object’ in the object-oriented
+  programming context. Which we are also going to need.
+
+² You can look up the ship of Theseus for a well-known example. But
+  the question was on people's minds long before that, at the very
+  least all the way to Plato, 5 centuries earlier.
+
+³ It might be tempting to associate the identity with the «address»
+  of the cell – where it is stored in memory. Tempting, but wrong:
+  even though Python does not move cells in memory, it «will» re-use
+  addresses, so an address of an cell that was destroyed can be used
+  by a different cell later. But it is still a «different cell»
+  even though it has the «same address». However, there is a useful
+  implication: if two cell have distinct addresses, they must be
+  distinct cells (they have a different identity). Beware though,
+  this does «not» hold universally in all programming languages!

@@ -1,0 +1,35 @@
+## Semantics
+
+There are two fundamental sides to the ‘programming language’ coin:
+syntax and semantics. Syntax is the easy part (and you probably
+already know most, if not all, Python syntax). Syntax simply tells
+you how a (valid) program looks; on the other hand, «semantics»
+tells you what the program «means», or in the simplest
+interpretation of meaning, what it «does». While this is a question
+that can be attacked formally (i.e. using math), there is no need to
+worry – we will only talk about semantics «intuitively» in this
+course.
+
+There are, in turn, two fundamental aspects of semantics:
+
+ • «control» – given the current situation, where does the program
+   go next? which is the next statement or expression that will be
+   executed?
+ • «data» – what are the values of variables, what are the results
+   of expressions? what is the program going to output when it
+   prints the ‘thing’ named ‹x›?
+
+Clearly, there is interplay between the two: when the program
+encounters an ‹if› statement, which statement comes next depends on
+the result of the expression in the «conditional». Intuitively, this
+is obvious. Sometimes, it is useful to be explicit even about things
+that are obvious.
+
+Just like with syntax and semantics, one of those aspects is clearly
+simpler: we all understand «control» quite well. You know what an
+‹if› statement does, what a function call does (though we will
+revisit that), what a ‹for› or a ‹while› does. So let's focus on the
+other one, «data». That turns out to be quite a bit trickier.¹
+
+¹ As easily shown by trying to explain an ‹if› to a non-programmer,
+  vs explaining variables. Variables are hard.

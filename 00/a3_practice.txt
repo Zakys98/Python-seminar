@@ -1,0 +1,58 @@
+## Practice Exercises
+
+Each chapter in this exercise collection has 4 types of exercises:
+elementary, practice, regular and voluntary, (3 + 6 + 6 + 3, for a
+total of 18)¹, and a variable number of demonstrations (heavily
+commented code that illustrates a particular concept or
+construction).
+
+The elementary and regular exercises come with reference solutions
+(in the folder ‹sol› in the source bundle, or in section K at the
+end of this document). The practice and voluntary exercises, on the
+other hand, focus on solving problems on your own.
+
+The practice exercises are to be worked out and submitted before the
+corresponding seminar (where you will discuss your submitted
+solutions as a group). These exercises come with two sets of test
+cases:
+
+ 1. ‘sanity’ which are enclosed (i.e. you can run them at your own
+    leisure as you work on your solution) and
+ 2. ‘verity’ which you cannot see, and will run only twice: Thursday
+    23:59 and then after the submission period closes on Saturday
+    (again 23:59).
+
+Two thirds of the points (1 point per exercise) are awarded on
+sanity tests alone (hence you can be sure that you have gained those
+points right after you submit). Test results will be visible in the
+«notepads» in the IS.
+
+To submit the exercises, obtain a copy of the study materials using
+‹pv248 update›, fill in the solutions, then use ‹pv248 submit› in
+the corresponding directory to submit them. Be sure to check the
+notepads to confirm that the submission was successful and that the
+tests passed. The «submission deadline» is at 23:59 of the last
+Saturday before the corresponding seminar:
+
+│ block │ unit │ lecture │  verity │ deadline │
+├───────│──────│─────────│─────────│──────────│
+│   1   │   1  │  13.9.  │  15.9.  │   17.9.  │
+│       │   2  │  20.9.  │  22.9.  │   24.9.  │
+│       │   3  │  27.9.  │  29.9.  │    1.10. │
+│       │   4  │   4.10. │   6.10. │    8.10. │
+│┄┄┄┄┄┄┄│┄┄┄┄┄┄│┄┄┄┄┄┄┄┄┄│┄┄┄┄┄┄┄┄┄│┄┄┄┄┄┄┄┄┄┄│
+│   2   │   5  │  11.10. │  13.10. │   15.10. │
+│       │   6  │  18.10. │  20.10. │   22.10. │
+│       │   7  │  25.10. │  27.10. │   29.10. │
+│       │   8  │   1.11. │   3.11. │    5.11. │
+│┄┄┄┄┄┄┄│┄┄┄┄┄┄│┄┄┄┄┄┄┄┄┄│┄┄┄┄┄┄┄┄┄│┄┄┄┄┄┄┄┄┄┄│
+│   3   │   9  │   8.11. │  10.11. │   12.11. │
+│       │  10  │  15.11. │  17.11. │   19.11. │
+│       │  11  │  22.11. │  24.11. │   26.11. │
+│       │  12  │  29.11. │   1.12. │    3.12. │
+
+Please be sure that you work out every graded exercise alone.
+Transgressions will be penalized (more details toward the end of
+this chapter).
+
+¹ Some exercises and demonstrations are currently missing.

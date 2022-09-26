@@ -1,0 +1,18 @@
+# S.1. Introductory Tasks
+
+The programming tasks for this block are as follows:
+
+ 1. ‹a_while›   – an interpreter for simple ‘while programs’,
+ 2. ‹b_splay›   – a self-balancing binary search tree,
+ 3. ‹c_same›    – a solver for ‘same game’,
+ 4. ‹d_shelter› – a simple information system.
+
+The tasks at hand only require basic programming skills and no
+special tricks nor advanced Python constructs. Some of the tasks
+require exceptions to be raised on errors, but again only basic use
+is needed (you should be fine with ‹raise RuntimeError( 'foo' )›).
+
+In the ‹splay› task, type annotations are optional, since they are a
+little tricky (the tree is generic in the type of values, but these
+values must be less-than comparable; you can find a ‘recipe’ for
+solving this in ‹02/p1_dsw›).

@@ -1,0 +1,44 @@
+# Objects, Classes and Types
+
+Starting this week, some of the exercises require static type
+annotations that can be checked with ‹mypy --strict› (this is the
+default: exercises, where static typing is tricky or burdensome will
+start with ‹# pragma mypy relaxed› – in those, you can use ‹Any› or
+even omit types entirely). The same principle will be true for tasks
+in task sets. In exercises and tasks where ‹mypy› is required,
+neither explicit ‹Any›, nor the ‹type: ignore› pragma can be used.
+These restrictions are enforced by the tests upon submission.
+
+Demonstrations:
+
+ 1. ‹mypy›     – annotation basics
+ 2. ‹class›    – creating objects, with class
+ 3. ‹generic›  – polymorphic types and mypy
+ 4. ‹type›     – classes at runtime
+ 5. ‹anno›     – working with type annotations
+
+Elementary exercises:
+
+ 1. ‹geometry› – define basic types for planar geometry
+
+Practice exercises:
+
+ 1. ‹dsw›       – Day, Stout & Warren balance binary trees
+ 2. ‹ts3norm›   – template system 3, normalization
+ 3. ‹ts3render› – template system 3, rendering into strings
+ 4. ‹bool›      – boolean expression trees
+ 5. ‹intersect› – computing intersections in a plane
+ 6. ‹list›      – linked list with generic type annotations
+
+Regular exercises:
+
+ 1. ‹json›      – recursive data types without gross hacks
+ 2. ‹rotate›    – traversing a tree using rotations
+ 3. ‹ts3bugs›   – more fun with template system 3
+ 4. ‹treap›     – randomized search trees
+ 5. ‹distance›  – shortest distance between two 2D objects
+ 6. ‹istree›    – finding cycles in object graphs
+
+Voluntary exercises:
+
+ 1. (this section is empty for now)

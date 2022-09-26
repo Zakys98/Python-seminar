@@ -1,0 +1,60 @@
+## Functions and Function Calls
+
+The mechanics of function calls in Python are quite standard and
+very similar to what you would encounter in any mainstream
+imperative language. That is, the interpreter maintains a «stack» of
+«activation records» (also known as «stack frames»). Each record
+keeps essentially two things:
+
+ 1. an equivalent of a «return address» – where in the program to
+    continue when the current function returns,
+ 2. an environment (in the technical sense from chapter 1) – i.e.
+    bindings of names to their values; this environment is realized
+    as «local bindings» and a reference to the lexically enclosing
+    scope, where the interpreter looks for names that aren't bound
+    locally.
+
+The ‘return address’ is somewhat tricky to visualize in the standard
+Python syntax with expressions, because we might need to return into
+the middle of an expression. Consider:
+
+    x = f(a) + b
+
+This is a statement with a function call in it – so far so good. But
+of course, when ‹f(a)› returns, we still need to do some work in
+that statement: namely, we need to take the return value of ‹f› and
+add ‹b› to it, and then assign the result into ‹x›. So the return
+address certainly can't be just a line number or some other
+reference to a statement. If you are tempted to say that we can
+remember the statement and just go looking for the call to ‹f›, this
+is not going to work either:
+
+    x = f(a) + f(b)
+
+What CPython (the standard Python interpreter) does internally is
+use a «bytecode representation» of the program, in which the call is
+a separate ‘instruction’. The above program fragment then becomes:
+
+    x₁ = f(a)
+    x₂ = f(b)
+    x  = x₁ + x₂
+
+Now it is clear what a ‘return address’ is, because each line has at
+most a single function call, and if it has a function call, the only
+thing that additionally happens on that line is binding its result
+to a name.
+
+There is one other important deviation between ‘traditional’
+languages like C or C++ and Python (shared by many other dynamic
+languages) – the stack in Python is not continuous, but is rather a
+linked list of heap-allocated records. Why this is so should become
+apparent when we deal with lexical closures in the next section, and
+with coroutines in the next chapter.
+
+There is one last important thing to note before we move on: a
+«function declaration» (using ‹def›) is a «statement» and hence can
+appear anywhere in the program where statements are permitted.¹
+With that, we can move on to actually talking about «closures».
+
+¹ Conversely, if you can put a ‹def› somewhere, you can put any
+  other statement in that spot too… think about it.

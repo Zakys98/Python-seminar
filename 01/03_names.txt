@@ -1,0 +1,48 @@
+## Names and Binding
+
+Now that we understand values and cells, we need to look at the
+other ‘side’ of variables: their «names». There are no fewer than 3
+important concepts that come into play:
+
+ • «name» itself is an identifier, usually an alphanumeric string
+   (give or take a few chars), that the programmer uses to refer to
+   a particular «value» or «cell» (depending on which of the two is
+   the more important concept in the given context),
+ • «binding» associates a «name» with a «cell» (or, again, a value):
+   you can visualise this as an ‘arrow’ connecting a name to its
+   cell,
+ • «environment» is the collection of names and their bindings
+   active at any given point in the execution of the program.
+
+A picture is said to be worth a thousand words (note that the dashed
+boundaries do not necessarily represent anything ‘physical’ in the
+sense ‘actually stored in memory at runtime’ – they are there to
+delineate the «concepts»):
+
+    ●┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+    ┆ variable ↓                      ↓ another variable ┆
+    ┆┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄●┆
+    ┆┆    ↓ name              ┆┆              name ↓    ┆┆
+    ┆┆ ┌─────┬──────────────┐ ┆┆ ┌──────────────┬─────┐ ┆┆
+    ┆┆ │ ‹x› ┆ ← identifier │ ┆┆ │ identifier → ┆ ‹y› │ ┆┆
+    ┆┆ └──┬──┴──────────────┘ ┆┆ └──────────────┴──┬──┘ ┆┆
+    ┆┆    │                   ┆┆                   │    ┆┆
+    ┆┆    │ ← binding         ┆┆        bindingg → │    ┆┆
+    ┆┆    ▼                   ┆┆                   ▼    ┆┆
+    ┆┆ ┌──┴──┬─────────┐      ┆┆      ┌─────────┬──┴──┐ ┆┆
+    ┆┆ │ ‹5› ┆ ← value │      ┆┆      │ value → ┆ ‹7› │ ┆┆
+    ┆┆ └─────┴─────────┘      ┆┆      └─────────┴─────┘ ┆┆
+    ┆┆   ↑ cell               ┆┆               cell ↑   ┆┆
+    ┆●┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘┆
+    └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄●
+                          ↑ environment
+
+There is one more concept that perhaps clarifies the role of a
+«name» (as opposed to an «identifier», which is a purely syntactic
+construction):
+
+ • «scope» is a property of a given «name» and gives bounds on the
+   «validity» of that name: which parts of the program can refer to
+   this name (notably, the same «string» can be associated with two
+   different «names», but only one of them might be in scope at any
+   given time).

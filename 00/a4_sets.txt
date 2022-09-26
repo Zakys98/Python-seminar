@@ -1,0 +1,142 @@
+## Task Sets
+
+There are 3 sets of tasks and each has a 4-week window when it can
+be submitted. In total, you will have 12 attempts at every task,
+spread across the 4 weeks. The submission deadlines (i.e. the dates
+when ‘verity’ tests run) are at 23:59 on these days:
+
+│ set │ week │   Mon   │   Wed   │   Fri   │
+├─────│──────│────────▻┼────────▻┼────────▻┼
+│   1 │    1 │  19.9.  │  21.9.  │  23.9.  │
+│     │    2 │  26.9.  │  28.9.  │  30.9.  │
+│     │    3 │   3.10. │   5.10. │   7.10. │
+│     │    4 │  10.10. │  12.10. │  14.10. │
+│┄┄┄┄┄│┄┄┄┄┄┄│┄┄┄┄┄┄┄┄┄│┄┄┄┄┄┄┄┄┄│┄┄┄┄┄┄┄┄┄│
+│   2 │    1 │  17.10. │  19.10. │  21.10. │
+│     │    2 │  24.10. │  26.10. │  28.10. │
+│     │    3 │  31.10. │   2.11. │   4.11. │
+│     │    4 │   7.11. │   9.11. │  11.11. │
+│┄┄┄┄┄│┄┄┄┄┄┄│┄┄┄┄┄┄┄┄┄│┄┄┄┄┄┄┄┄┄│┄┄┄┄┄┄┄┄┄│
+│   3 │    1 │  14.11. │  16.11. │  18.11. │
+│     │    2 │  21.11. │  23.11. │  25.11. │
+│     │    3 │  28.11. │  30.11. │   2.12. │
+│     │    4 │   5.12. │   7.12. │   9.12. │
+
+### Submitting Solutions
+
+The easiest way to submit a solution is this:
+
+    $ ssh aisa.fi.muni.cz
+    $ cd ~/pv248/s1
+    <edit files until satisfied>
+    $ pv248 submit s1_a_while
+
+The number of times you submit is not limited (but not every
+submission will be necessarily evaluated, as explained below).
+
+NB. «Only» the files listed in the assignment will be submitted and
+evaluated. Please put your «entire» solution into «existing files».
+
+You can check the status of your submissions by issuing the
+following command:
+
+    $ pv248 status
+
+In case you already submitted a solution, but later changed it, you
+can see the differences between your most recent submitted version
+and your current version by issuing:
+
+    $ pv248 diff
+
+The lines starting with ‹-› have been removed since the submission,
+those with ‹+› have been added and those with neither are common to
+both versions.
+
+### Evaluation
+
+There are three sets of automated tests which are executed on the
+solutions you submit:
+
+ • The first set is called «syntax» and runs immediately after you
+   submit. Only 2 checks are performed: the code can be loaded (no
+   syntax errors) and it passes mypy (strictness depending on the
+   task at hand).
+   
+ • The next step is «sanity» and runs every 6 hours, starting at
+   midnight (i.e. 0:00, 6:00, 12:00 and 18:00). Its main role is to
+   check that your program meets basic semantic requirements, e.g.
+   that it recognizes correct inputs and produces correctly
+   formatted outputs. The ‘sanity’ test suite is for your
+   information only and does not guarantee that your solution will
+   be accepted. The ‘sanity’ test suite is only executed if you
+   passed ‘syntax’.
+   
+ • Finally the «verity» test suite covers most of the specified
+   functionality and runs 3 times a week – Monday, Wednesday and
+   Friday at 23:59, right after the submission deadline. If you pass
+   the verity suite, the task is considered complete. The verity
+   suite will «not» run unless the code passes ‘sanity’.
+
+Only the most recent submission is evaluated, and each submission is
+evaluated at most once in the ‘sanity’ and once in the ‘verity’
+mode. You will find your latest evaluation results in the IS in
+notepads (one per assignment). You can still submit new versions
+after you pass ‘verity’ on a given task (e.g. because you want to
+improve the code for review). If your later submission happens to
+fail tests, this is of no consequence (the task is still considered
+complete).
+
+### Grading
+
+Each task that passes verity tests is worth «15 points». For those
+tasks, you can also get additional points for «review», in the
+«following» block:
+
+ • set 1: 60 for correctness in block 1, 30 for reviews in block 2,
+ • set 2: 60 for correctness in block 2, 30 for reviews in block 3,
+ • set 3: 60 for correctness in block 3, 30 for reviews in block 4
+   (the «exam» one).
+
+### Guidelines
+
+The general principles outlined here apply to all assignments. The
+first and most important rule is, use your brain – the
+specifications are not exhaustive and sometimes leave room for
+different interpretations. Do your best to apply the most sensible
+one. Do not try to find loopholes (all you are likely to get is
+failed tests). Technically correct is «not» the best kind of
+correct.
+
+Think about pre- and postconditions. Aim for weakest preconditions
+that still allow you to guarantee the postconditions required by the
+assignment. If your preconditions are too strong (i.e. you disallow
+inputs that are not ruled out by the spec) you may fail the tests.
+
+Do not print anything that you are not specifically directed to.
+Programs which print anything that wasn't specified will fail tests.
+If you are required to print something or create strings, follow the
+format given «exactly».
+
+You can use the «standard library». Third-party libraries are not
+allowed, unless specified as part of the assignment. Make sure that
+your classes and methods use the correct spelling, and that you
+accept and/or return the correct types. In most cases, either the
+‘syntax’ or the ‘sanity’ test suite will catch problems of this
+kind, but we cannot guarantee that it always will – do not rely on
+it.
+
+If you don't get everything right the first time around, do not
+despair. There are quite a few attempts to fix your mistakes (though
+if you aren't getting things right by the «second or third attempt»,
+you might be doing something wrong). In the real world, the first
+delivered version of your product will rarely be perfect, or even
+acceptable, despite your best effort to fulfill every customer
+requirement. Better get used to occasional setbacks.
+
+Truth be told, only very small programs can be realistically (i.e.
+without expending considerable effort) written completely correctly
+in one go. Of course, what is ‘very small’ varies with experience:
+for some of you, assignments in sets will fall into this ‘very
+small’ category. Hopefully, for most of you, at least by the end of
+the course, the practice exercises will be ‘very small’ in this
+sense.

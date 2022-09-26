@@ -1,0 +1,123 @@
+## Reviews
+
+All reviews (teacher and peer) happen in the block that follows the
+block in which the code was written, i.e. reviews will happen in
+blocks 2-4. All code that passed verity tests is eligible for review
+(again both teacher and peer). If you submit (and pass) multiple
+tasks, reviewers can choose which they want to review.
+
+While you cannot get reviews on code that failed verity tests, such
+solutions can be discussed in the seminar (with your tutor and with
+your classmates), even anonymously if you prefer. This should give
+you an idea where you made mistakes and how to improve in the
+future. Of course, this is only possible after the last deadline on
+the assignment passes.
+
+### Peer Reviews
+
+You may also participate as a reviewer through the peer review
+system (your solutions are up for peer review automatically). In
+addition to collecting points for the effort, we hope that the
+reviews you write will help you better understand how to read other
+people's code, and the ones you receive help you improve your own
+code and its understandability for others.
+
+### Reading Reviews
+
+The ‹pv248 update› command will indicate whether someone reviewed
+your code, by printing a line of the form:
+
+    A reviews/hw1.from.xlogin
+
+To read the review, look at the files in
+‹~/pv248/reviews/hw1.from.xlogin› – you will find a copy of your
+submitted sources along with comments provided by the reviewer.¹
+
+If you like, after you read your review, you can write a few
+sentences for the reviewer into ‹note.txt› in the review directory
+(please wrap lines to 80 columns) and then run:
+
+    $ pv248 review --accept
+
+Your comments in ‹note.txt› will be sent to the reviewer through IS.
+Of course you can also discuss the review by other means.
+
+¹ There is also a copy in the study materials in IS, in the
+  directory named ‹reviews›. Only you can see the reviews intended
+  for you.
+
+### Writing Reviews
+
+To write a review, start with the following command:
+
+    $ pv248 review --assignment s1_a_while
+
+Substitute the name of the assignment you want to review (note that
+only tasks that you have successfully solved are eligible). A
+solution for you to review will be picked at random.
+
+    $ cd ~/pv248/reviews/
+    $ ls
+
+There will be a directory for each of the reviews that you
+requested. Each directory contains the source code submitted for
+review, along with further instructions (the file ‹readme.txt›).
+
+When inserting your comments, please use double ‹##› to make the
+comment stand out, like this:
+
+    ## A longer comment should be wrapped to 80 columns or less,
+    ## and each line should start with the ## marker.
+
+In each block, you can write up to 3 reviews. The limit is applied
+at checkout time: once you agree to do a particular review, you
+cannot change your mind and ‘uncheckout’ it to reclaim one of the 3
+slots.
+
+### Grading
+
+All reviews carry a grade (this includes peer reviews), one of:
+
+ • «A» – very good code, easy to read, no major problems,
+ • «B» – not great, not terrible,
+ • «C» – you made the reviewer sad.
+
+The points you get for the review depend on the grade:
+
+ • for «teacher» review, you get «15», «7.5» or «0» points,
+ • for «peer» review, the reviewer gets 2 points for writing the
+   review in the first place, and a variable part that affects both
+   the reviewer and the author of the code:
+   
+   ◦ «A»: the reviewer was so impressed that they give the entire
+     variable part of the reward to the coder (0 to reviewer, 2 to
+     coder),
+   ◦ «B»: mixed bag, the reward is split (0.5 to reviewer, 1 to
+     coder),
+   ◦ «C»: the reviewer keeps everything as a compensation for the
+     suffering they had to endure (1 to reviewer, 0 to coder).
+
+Or in a tabular form:
+
+│          │       A │         B │       C │
+├──────────│─────────│───────────│─────────│
+│ reviewer │   2 + 0 │   2 + 0.5 │   2 + 1 │
+│ coder    │       2 │         1 │       0 │
+
+NB. If you are writing a peer review: please include the grade as
+‹@A›, ‹@B› or ‹@C› at the «top» (first line) of the file you are
+reviewing.
+
+For «teacher» reviews, if you get a grade other than «A», you can
+improve your solution and submit it again. The reviewers will have
+about 10 days to finish the reviews, then you have 9 days to
+resubmit an improved solution (but please note that the solution
+must still pass verity tests, which run on the usual Mon-Wed-Fri
+cadence, to be eligible for a second round of review). The relevant
+dates are:
+
+│ set │ deadline │ review │ resubmit │
+├─────│─────────▻│───────▻│─────────▻│
+│  1  │   14.10. │ 26.10. │    4.11. │
+│  2  │   11.11. │ 23.11. │    2.12. │
+│  3  │    9.12. │ 21.12. │    6.1.  │

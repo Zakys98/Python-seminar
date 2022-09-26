@@ -1,0 +1,29 @@
+# Lexical Closures
+
+Demonstrations:
+
+ 1. ‹func›    – a few more features of function definitions
+ 2. ‹closure› – the basic intuition and syntax
+ 3. ‹capture› – mechanics of capturing variables
+
+Preparatory exercises:
+
+ 1. ‹merge›   – combine items in a dictionary
+ 2. ‹dice›    – dicing and slicing lists
+ 3. ‹newton›  – finding roots with closures
+ 4. ‹sort›    – sorting and grouping with callbacks
+ 5. ‹file›    – make pure functions work with files
+ 6. ‹counter› – keeping state
+
+Regular exercises:
+
+ 1. ‹fold›    – folding lists
+ 2. ‹trees›   – folding trees
+ 3. ‹bisect›  – finding roots of general functions
+ 4. ‹each›    – traversing data structures
+ 5. ‹objects› – a closure-based object system
+ 6. ‹inherit› – the same, extended with simple inheritance
+
+Voluntary exercises:
+
+ 1. (nothing here yet)

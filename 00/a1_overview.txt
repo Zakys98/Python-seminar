@@ -1,0 +1,59 @@
+## Course Overview
+
+Since this is a programming subject, the coursework – and grading –
+will center around actual programming. There will be 2 types of
+programs that you will write in this subject: very small programs
+for weekly exercises (you should be able to solve these at the rate
+of 2-3 per hour) and small programs for homework (a few hundred
+lines and anything from a few hours to a day or two of work).
+
+As you probably know by now, writing programs is hard and as a
+consequence, this course will also be rather hard. You will need to
+put in effort to pass the subject. Hopefully, you will have learned
+something by the end of it. Further details on the organisation of
+this course are in the remaining files in this directory:
+
+ • ‹a2_grading›  – what is graded and how; what you need to pass,
+ • ‹a3_practice› – weekly ‘practice’ (preparatory) exercises,
+ • ‹a4_sets›     – general guidelines that govern assignment sets,
+ • ‹a5_exam›     – final exam (colloquium),
+ • ‹a6_reviews›  – teacher and peer reviews,
+ • ‹a7_cheating› – don't.
+
+Study materials for each week are in directories ‹01› through ‹12›.
+Start by reading ‹00_intro.txt›. The assignment sets are in
+directories ‹s1› through ‹s3›, one for each 4-week block (again,
+start by reading the intro).
+
+The exercises for any given week will make use of the material
+covered in the lecture, though some weeks it will be a fairly loose
+fit. Especially when the lecture material is broad (like in weeks 1
+and 2), the seminar will mainly include general programming
+exercises. Topics will get more specific and focused as the
+semester progresses.
+
+The subject is divided into 4 blocks, each 4 weeks long. The first
+3 blocks are during the semester, the last block is in the exam
+period. The topics covered are as follows:
+
+│ block │      │ topic                             │  date  │
+├───────│─────▻┼◅──────────────────────────────────│────────│
+│    1  │   1. │ expressions, variables, functions │ 13.9.  │
+│       │   2. │ objects, classes, types, mypy     │ 20.9.  │
+│       │   3. │ scopes, lexical closures          │ 27.9.  │
+│       │   4. │ iterators, generators, coroutines │  4.10. │
+│┄┄┄┄┄┄┄│┄┄┄┄┄┄│┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄│┄┄┄┄┄┄┄┄│
+│    2  │   5. │ memory management, refcounting    │ 11.10. │
+│       │   6. │ object and class internals        │ 18.10. │
+│       │   7. │ generators & coroutines cont'd    │ 25.10. │
+│       │   8. │ testing, profiling, pitfalls      │  1.11. │
+│┄┄┄┄┄┄┄│┄┄┄┄┄┄│┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄│┄┄┄┄┄┄┄┄│
+│    3  │   9. │ text, predictive parsing          │  8.11. │
+│       │  10. │ databases, relations vs objects   │ 15.11. │
+│       │  11. │ asynchronous programming, http    │ 22.11. │
+│       │  12. │ math and statistics, recap        │ 29.11. │
+
+The fourth block is relevant to you only if your ending type is
+‘colloquium’ (see following sections for details) and does not bring
+any new material (since there are no lectures or seminars). It will
+instead feature reviews and a final test.

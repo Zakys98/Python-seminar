@@ -1,0 +1,44 @@
+## Grading
+
+To complete the course, you need to collect «60 points» in «each
+block». There are no other requirements.
+
+NB. If your ending type is ‘credit (z)’ only blocks 1–3 are relevant
+for you (i.e. the fourth block in exam period, and hence the final
+exam, do not exist for you). If your ending type is ‘colloquium (k)’
+then you need those 60 points in all blocks, including the 4th.
+
+The subject entails a number of different activities, all of which
+are rewarded with points. The goal is to give you some freedom in
+what you want to focus on: the points are fully interchangeable.
+There are three main areas from which you can mix and match your
+preferences:
+
+ 1. seminars: work out short exercises, attend the seminar,
+    participate actively,
+ 2. sets: work out more challenging exercises over a longer period
+    of time (up to a month),
+ 3. code review: write elegant code and help others do the same.
+
+The points are split 2:2:1 between those areas. Please keep in mind
+that «each block» is «graded separately»: to pass the subject, you
+need to pass all four (or three, see above) blocks. In each block,
+the maximum is «120–150 points», while «60» are required to pass it.
+The available points are allocated as follows:
+
+ • max 60pt seminars (4 weeks, 15 points each week):
+   ◦ 6pt practice exercise sanity (1pt/exercise),
+   ◦ 3pt practice exercise verity (.5pt/exercise),
+   ◦ 3pt seminar attendance,
+   ◦ 3pt activity in the seminar,
+ • max 60pt task sets (4 tasks, 15 points each),
+ • max 30pt reviews of tasks from previous block:
+   ◦ 15pt teacher review (depending on grade and task),
+   ◦ 15pt peer reviews.
+
+In block 4, there are no seminars nor tasks, but the final test in
+this block is worth 90pt.
+
+Only points awarded within a block count toward passing it. That
+means, for instance, that all reviews of tasks from set 1 are
+counted in block 2.

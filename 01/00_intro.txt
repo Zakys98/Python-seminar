@@ -1,0 +1,53 @@
+# Python 101
+
+As we have mentioned, each chapter is split into 4 sections:
+demonstrations, practice (preparatory) exercises, regular exercises
+and voluntary exercises. The demos are complete programs with
+comments that should give you a quick introduction to using the
+constructs that you will need in the actual exercises. The demos for
+the first week are these:
+
+ 1. ‹list›    – using lists
+ 2. ‹tuple›   – lists, sort of, but immutable
+ 3. ‹dict›    – using dictionaries
+ 4. ‹str›     – using strings
+ 5. ‹fun›     – writing functions
+
+Sometimes, there will be ‘elementary’ exercises: these are too
+simple to be a real challenge, but they are perhaps good warm-up
+exercises to get into the spirit of things. You might want to do
+them before you move on to the practice exercises.
+
+ 1. ‹fibfib›  – iterated Fibonacci sequence
+
+The second set of exercises are those that are meant to be solved
+«before» the corresponding seminar. The first batch should be
+submitted by «17th of September». The corresponding seminars are in
+the week starting on 19th of September. Now for the exercises:
+
+ 1. ‹rpn›     – Reverse Polish Notation with lists
+ 2. ‹image›   – compute the image of a given function
+ 3. ‹ts3esc›  – escaping magic character sequences
+ 4. ‹alchemy› – transmute and mix inputs to reach a goal
+ 5. ‹chain›   – solving a word puzzle
+ 6. ‹cycles›  – a simple graph algorithm with dictionaries
+
+The third section are so-called ‘regular’ exercises. Feel free to
+solve them ahead of time if you like. Some of them will be done in
+the seminar. When you are done (or get stuck), you can compare your
+code to the example solutions in Section K near the end of the PDF,
+or in the directory ‹sol› in the source bundle. The exercises are:
+
+ 1. ‹permute›   – compute digit permutations of numbers
+ 2. ‹rfence›    – the rail fence transposition cipher
+ 3. ‹life›      – the game of life
+ 4. ‹breadth›   – statistics about a tree
+ 5. ‹radix›     – radix sorting of strings
+ 6. ‹bipartite› – check whether an input graph is bipartite
+
+The final set are voluntary exercises, which have sanity tests
+bundled, but reference solutions are not provided. They are meant
+for additional practice, especially when you revisit previous
+chapters later in the semester.
+
+ 1. (this section is empty for now)

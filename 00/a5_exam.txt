@@ -1,0 +1,42 @@
+## Final Exam
+
+If your ending type is ‘colloquium (k)’, you need to complete the
+4th block, which takes place in the exam period. In this block, you
+can get points for reviews (for assignment set 3) and for the final
+exam, which consists of 6 exercises, each worth 15 points. Since you
+need 60 points to pass, that means either:
+
+ • 4 out of 6 exam exercises,
+ • 15+ points from reviews + 3 out of the 6 exam exercises.¹
+
+The exercises will come from this collection (types ‹p›, ‹r› and
+‹v›) and so shouldn't be too hard to solve if you passed the first
+three blocks.² The main differences are:
+
+ 1. you won't be able to consult anyone at the exam, for real
+    (though this should have been the case during the semester
+    too!),
+ 2. no internet (and hence no googling and no ‹stackoverflow›), only
+    this document (without the solution key) and the standard Python
+    documentation.
+
+In addition to the documentation, the exam computers will have the
+following software installed:
+
+ • Python interpreter (obviously) along with ‹mypy›,
+ • a selection of text editors, VS Code and Thonny.
+
+You will have a total of 4.5 hours to solve the exercises and you
+will get interim ‘verity’ results (without counterexamples) every 90
+minutes. Use of ‹mypy› at the exam will follow our use throughout
+the semester: passing ‹mypy› will be required (and checked by syntax
+tests, so you get early feedback), but strict mode will be only
+enabled for exercises with sufficiently simple types.
+
+¹ Yes, in theory you can get 30 points on reviews, but don't count
+  on it. There are too many variables. 15 is very possible though.
+
+² If you are worried, you can change the ending type to ‘z’, at the
+  expense of 1 credit. On the other hand, don't be worried, the exam
+  isn't any harder than what you did during the semester, and
+  there's plenty of time.

@@ -1,0 +1,188 @@
+## Lexical Closures
+
+Since ‹def› is a statement, this is a legal Python program:
+
+    def foo():                              # python
+        def bar():
+            pass
+
+Of course, in isolation, this is not very interesting: the only
+difference at the first sight is that ‹bar› is only defined locally
+(i.e. it is a local binding, not visible outside of ‹foo›). That can
+be useful, but is not a real game changer. The following is:
+
+    def foo():                              # python
+        x = 7
+        def bar():
+            return x
+        x = 8
+        assert x == bar()
+
+In some sense this is nothing new: it is entirely normal that a
+function can use variables (and functions) defined in the same scope
+as itself. Say like this:
+
+    def quux():                             # python
+        pass
+    
+    def baz():
+        quux()
+
+This program is not surprising in any way, yet what is happening is
+the same thing as above: when a name is not found in the local
+scope, the lookup continues in the «lexically» enclosing scope. And
+when we say lexically, we mean «syntactically» (but the former term
+somehow got entrenched, even if it is not technically correct).
+Which means that, since ‹x› is not bound locally in ‹bar› above,
+when it is mentioned, the lookup initially fails. But the next
+enclosing lexical scope is that of ‹foo›, and sure enough, ‹foo› has
+a binding for ‹x›. So that binding is used.
+
+Why is this interesting? We need to go back to chapter 1 to
+appreciate what is going on here. The identifier ‹x› is still the
+same, but if we enter ‹foo› twice, like this:
+
+    foo()
+    foo()
+
+we get two different «names» ‹x›. And each of those names has a
+possibly different binding. Which means that there are now two cells
+(objects) that correspond to the syntactic definition of ‹bar›. It
+is in this sense that the «localness» of that definition becomes
+important. Consider a simple case of an isolated function:
+
+    def quux():                             # python
+        pass
+
+When we take this apart, executing the two lines results in the
+following situation:
+
+  ┌──────────┐     ┌───────────┐
+  │  ‹quux›  │────▶│  ‹pass›   │
+  └──────────┘     └───────────┘
+    ↑ name          ↑ function
+
+In this sense, the function ‘body’ is an (immutable) object like any
+other.¹ Except the situation above is not how things actually look.
+It is a little more complicated:
+
+                          code          ┌───────────┐
+    ↓ name              ┌──────────────▶│  ‹pass›   │
+  ┌──────────┐     ┌─────────┐          └───────────┘
+  │  ‹quux›  │────▶│ closure │
+  └──────────┘     └─────────┘          ┌───────────┐
+                        └──────────────▶│ (nothing) │
+                          environment   └───────────┘
+
+For the ‹foo› defined earlier (with a nested ‹bar› function), we get
+something like this at the time of the ‹assert› (notice that we are
+now looking at the program in the middle of executing a function –
+the central object is an «activation record», or a «frame» for
+short):
+
+   ┌───────┐ code   ┌───────────┐          code  ┌────────────┐
+   │ frame │───────▶│ ‹x = 7…›  │         ┌─────▶│ ‹return x› │
+   └───────┘        └───────────┘         │      └────────────┘
+       │    locals  ┌───────┬───┐    ┌─────────┐
+       └───────────▶│ ‹bar› ┆   │───▶│ closure │
+                    ├───────┼───┤    └─────────┘
+                    │ ‹x›   ┆   │─┐       │
+                    └───────┴───┘ ▼       │ environment
+                        ▲       ┌───┐     │
+                        │       │ 8 │     │
+                        │       └───┘     │
+                        └─────────────────┘
+
+Well, that's the «logical» or «semantic» picture. The implementation
+is unfortunately somewhat different – unlike everything else in
+Python, the captured environment is «not» represented as a reference
+to the enclosing environment (a ‹dict›) at runtime. Instead, it is
+flattened into a tuple of «reified cells».² The local environment
+then pretends that they are regular bindings, except they are
+actually accessed through these fake cells (you could call them
+pointers, or references, because that's basically what they are – a
+single nameless binding, or ‘arrow’). Why? Two reasons:
+
+ 1. We do not want the captured environment to keep all local
+    variables from the enclosing function alive. If the inner
+    function (the closure) is returned or stored somewhere, that
+    would tie the entire scope's lifetime to that return value. This
+    would be expensive. However, it's not super important right now
+    – we will get back to object lifetime in the week after the
+    next.
+ 2. Remember how ‹=› is a (re)binding operator? Now «that» is a
+    problem.
+
+What's wrong with rebinding? Consider the following:
+
+    def foo():                              # python
+        x = 7
+        def bar():
+            x = 8
+            return x
+        x = 9
+
+If the inner function rebinds a captured binding, the connection
+breaks – the outer function has a different binding for ‹x› than the
+inner function. Actually, as written, ‹x› in ‹bar› is completely
+independent from ‹x› in ‹foo›, and this is just regular shadowing.
+But how about this:
+
+    def foo():                              # python
+        x = 7
+        def bar():
+            x = x + 1
+            return x
+        x = 9
+
+Now this is an ‹UnboundLocalError›. Oh dear. That's because Python
+notices that you are binding ‹x› in ‹bar› which can only happen if
+‹x› is a local variable in ‹bar› (i.e. not captured). So, an error.
+How to get around this? Tell Python explicitly that this is intended
+to be a capture:
+
+    def foo():                              # python
+        x = 7
+        def bar():
+            nonlocal x
+            x = x + 1
+            return x
+        x = 9
+        bar()
+        assert x == 10
+
+But now we have a new problem. Initially, ‹x› is a capture, but if
+‹=› on a ‹nonlocal› behaves like a regular binding, the connection
+still breaks: ‹x› in ‹bar› is bound to a new value (cell) and the
+‹assert› fails. But it doesn't fail. Why doesn't it fail?
+
+Because ‹nonlocal› captures are magic, as per the above. When a name
+is marked ‹nonlocal›, its behaviour changes in «both» the inner and
+the outer function. In the outer function, the binding is known as a
+«cell variable»³ and all access to it is indirected through the same
+«reified cell» mechanism that is used for «captures».⁴ When you bind
+a ‹nonlocal› name, it is «not the name» that is being bound: it is
+the (normally invisible) ‹cell› that the name itself is bound to.
+Yes, it is a terrible hack (I am sorry). But this is the mechanism
+that makes the ‘binding’ apparently shared between the inner and the
+outer function.
+
+You might find some consolation in the fact that the overall effect
+is equivalent to the inner function updating the outer environment,
+and the way things are actually implemented is simply an
+optimisation.
+
+¹ It does remember the name with which it was defined, but this
+  is purely a technicality and can be ignored.
+² The tuple is accessible as ‹foo.__closure__› and the values stored
+  in that tuple are, for better or worse, of a type actually called
+  ‹cell›. Whether that is a happy or an unhappy coincidence is left
+  to figure out as an exercise for the reader.
+³ You can find the names of such variables in a tuple called
+  ‹foo.__code__.co_cellvars›. 
+⁴ Access to cell variables and to captures (actually called
+  «free variables» in the CPython interpreter) is through a separate
+  set of opcodes that deal with the extra indirection through the
+  ‹cell› object. When reading, the cell is automatically
+  dereferenced. When binding, it is the cell that is rebound, not
+  the name.
