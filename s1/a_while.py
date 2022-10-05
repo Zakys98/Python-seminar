@@ -72,174 +72,188 @@
 # input). At runtime, detect and report any attempts to divide by
 # zero.
 
+from typing import Callable
 import re
 
-class GlobalContext():
-	globalVariables = {}
+from rx import catch
 
 
-
-class Helpers():
-	@staticmethod
-	def getStrIndentation(string : str):
-		return len(string) - len(string.lstrip()) # TODO if there is tab, throw error
-
-	@staticmethod
-	def checkVarName(name :str):
-		location = re.search("^$", name) #TODO not finished
-		if location == None:
-			return False
-		return True
-
-	@staticmethod
-	def throwError(what, whichLine):
-		GlobalContext.globalVariables["#error"] = whichLine
-		raise RuntimeError(what)
+class GlobalContext:
+    globalVariables: dict[str, int] = {}
 
 
+class Helpers:
+    @staticmethod
+    def getStrIndentation(string: str) -> int:
+        # TODO if there is tab, throw error
+        return len(string) - len(string.lstrip())
 
-variableRegex="[a-zA-Z][a-zA-Z0-9_]*"
-operationsRegex="add|sub|mul|div|and|or|nand|lt|gt|eq|leq|geq"
+    @staticmethod
+    def checkVarName(name: str) -> bool:
+        location = re.search("^$", name)  # TODO not finished
+        if location == None:
+            return False
+        return True
+
+    @staticmethod
+    def set_error(whichLine: int) -> None:
+        GlobalContext.globalVariables["#error"] = whichLine + 1
 
 
-class Program():
-	def __init__(self, sourceCode) -> None:
-		self.sourceCode = sourceCode
-		self.sourceLines = sourceCode.splitlines()
-		ass = AssignmentCommand()
-		ass.parse(self.sourceLines, 0)
-		ass.run()
+variableRegex = "[a-zA-Z][a-zA-Z0-9_]*"
+operationsRegex = "add|sub|mul|div|and|or|nand|lt|gt|eq|leq|geq"
 
-	def create(self):
-		pass
 
-	def run(self):
-		pass
+class Program:
+    def __init__(self, sourceCode: str) -> None:
+        self.sourceLines = sourceCode.splitlines()
+        self.actual_line = 0
 
-class Command():
-	def run(self):
-		pass
+    def create(self) -> None:
+        while self.actual_line < len(self.sourceLines):
+            cmd = self.sourceLines[self.actual_line].strip().split(' ')[0]
+            if cmd == 'if':
+                if_cmd = IfCommand()
+                self.actual_line = if_cmd.parse(
+                    self.sourceLines, self.actual_line)
+            elif cmd == 'while':
+                pass
+            else:
+                ass_cmd = AssignmentCommand()
+                self.actual_line = ass_cmd.parse(
+                    self.sourceLines, self.actual_line)
+
+    def run(self) -> None:
+        pass
+
+
+class Command:
+    def run(self) -> None:
+        pass
+
 
 class WhileCommand(Command):
-	pass
+    pass
+
 
 class IfCommand(Command):
-	conditionVar = ""
-	commandsBlock = None
+    conditionVar = ""
+    commandsBlock = None
 
-	def run (self):
-		if(GlobalContext.globalVariables[self.conditionVar] != 0):
-			self.commandsBlock.run()
+    #def run(self) -> None:
+    #    if(GlobalContext.globalVariables[self.conditionVar] != 0):
+    #       self.commandsBlock.run()
 
-	def parse(self,sourceLines, lineNumber):
-		cmd = sourceLines[lineNumber]
-		regexPattern = f"\s*if ({variableRegex})\s*$"
-		regexResult = re.match(regexPattern, cmd)
-		if(regexResult == None):
-			return Helpers.throwError("Not a condition format.", lineNumber)
-		self.conditionVar = regexResult.group(1)
+    def parse(self, sourceLines: list[str], lineNumber: int) -> int:
+        cmd = sourceLines[lineNumber]
+        regexPattern = f"\s*if ({variableRegex})\s*$"
+        regexResult = re.match(regexPattern, cmd)
+        if regexResult is None:
+            Helpers.set_error(lineNumber)
+            raise RuntimeError('Not a condition format.')
+        self.conditionVar = regexResult.group(1)
+        # tenhle if tady asi nebude, kazda variable ma na zacatku 0
+        if self.conditionVar not in GlobalContext.globalVariables:
+            Helpers.set_error(lineNumber)
+            raise RuntimeError('Variable does not exist.')
+        self.commandsBlock = BlockOfCommands()
+        nextLine = self.commandsBlock.parseBlock(sourceLines, lineNumber + 1)
 
-		self.commandsBlock = BlockOfCommands()
-		nextLine = self.commandsBlock.parseBlock(sourceLines, lineNumber +1)
-
-		return nextLine
-
-
-
-
-
+        return nextLine
 
 
 class AssignmentCommand(Command):
 
-	varName = ""
+    def __init__(self) -> None:
+        super().__init__()
+        self.assignmentLambda: dict[str, Callable[[str, str], int]] = {
+            'add': lambda first, second: GlobalContext.globalVariables[first] + GlobalContext.globalVariables[second],
+            'sub': lambda first, second: GlobalContext.globalVariables[first] - GlobalContext.globalVariables[second],
+            'mul': lambda first, second: GlobalContext.globalVariables[first] * GlobalContext.globalVariables[second],
+            'div': lambda first, second: GlobalContext.globalVariables[first] // GlobalContext.globalVariables[second],
+            'and': lambda first, second: GlobalContext.globalVariables[first] and GlobalContext.globalVariables[second],
+            'or': lambda first, second: GlobalContext.globalVariables[first] or GlobalContext.globalVariables[second],
+            'nand': lambda first, second: not(GlobalContext.globalVariables[first] and GlobalContext.globalVariables[second]),
+            'lt': lambda first, second: GlobalContext.globalVariables[first] < GlobalContext.globalVariables[second],
+            'gt': lambda first, second: GlobalContext.globalVariables[first] > GlobalContext.globalVariables[second],
+            'eq': lambda first, second: GlobalContext.globalVariables[first] == GlobalContext.globalVariables[second],
+            'leq': lambda first, second: GlobalContext.globalVariables[first] <= GlobalContext.globalVariables[second],
+            'geq': lambda first, second: GlobalContext.globalVariables[first] >= GlobalContext.globalVariables[second]
+        }
 
-	def run(self):
-		GlobalContext.globalVariables[self.varName] = self.assignmentLambda()
+    # def run(self) -> None:
+    #    GlobalContext.globalVariables[self.where_save] = self.assignmentLambda()
 
-
-	def parse(self, sourceLines, lineNumber):
-		cmd = sourceLines[lineNumber]
-		#x = 6
-		regexPattern1 = "^\s*({var}) = (\d+)\s*$".format(var=variableRegex)
-		regexResult1 = re.match(regexPattern1, cmd)
-		#TODO numbers can be negative!
-		if(regexResult1 != None):
-			varName = regexResult1.group(1)
-			varValue = regexResult1.group(2)
-			self.varName = varName
-			self.assignmentLambda = lambda: int(varValue)
-			return lineNumber + 1
-		#x = add y z
-		regexPattern2 = "^\s*({var}) = ({operation}) ({var}) ({var})\s*$".format(var=variableRegex, operation=operationsRegex) # TODO select which operations allowed
-		regexResult2 = re.match(regexPattern2, cmd)
-		if(regexResult2 != None):
-			whereSave = regexResult2.group(1)
-			self.whereSave = regexResult2.group(1)
-			operation = regexResult2.group(2)
-			firstOperand = regexResult2.group(3)
-			secondOperand = regexResult2.group(4)
-			if(operation == "add"):
-				self.assignmentLambda = lambda: GlobalContext.globalVariables[firstOperand] + GlobalContext.globalVariables[secondOperand]
-			elif(operation == "sub"):
-				self.assignmentLambda = lambda: GlobalContext.globalVariables[firstOperand] - GlobalContext.globalVariables[secondOperand]
-			elif(operation == "mul"):
-				self.assignmentLambda = lambda: GlobalContext.globalVariables[firstOperand] * GlobalContext.globalVariables[secondOperand]
-			elif(operation == "div"):
-				self.assignmentLambda = lambda: GlobalContext.globalVariables[firstOperand] // GlobalContext.globalVariables[secondOperand]
-			elif(operation == "and"):
-				self.assignmentLambda = lambda: GlobalContext.globalVariables[firstOperand] and GlobalContext.globalVariables[secondOperand]
-			elif(operation == "or"):
-				self.assignmentLambda = lambda: GlobalContext.globalVariables[firstOperand] or GlobalContext.globalVariables[secondOperand]
-			elif(operation == "nand"):
-				self.assignmentLambda = lambda: not (GlobalContext.globalVariables[firstOperand] and GlobalContext.globalVariables[secondOperand])
-			elif(operation == "lt"):
-				self.assignmentLambda = lambda: GlobalContext.globalVariables[firstOperand] < GlobalContext.globalVariables[secondOperand]
-			elif(operation == "gt"):
-				self.assignmentLambda = lambda: GlobalContext.globalVariables[firstOperand] > GlobalContext.globalVariables[secondOperand]
-			elif(operation == "eq"):
-				self.assignmentLambda = lambda: GlobalContext.globalVariables[firstOperand] == GlobalContext.globalVariables[secondOperand]
-			elif(operation == "leq"):
-				self.assignmentLambda = lambda: GlobalContext.globalVariables[firstOperand] <= GlobalContext.globalVariables[secondOperand]
-			elif(operation == "geq"):
-				self.assignmentLambda = lambda: GlobalContext.globalVariables[firstOperand] >= GlobalContext.globalVariables[secondOperand]
-			else:
-				Helpers.throwError("Bad operation", lineNumber)
-			return lineNumber + 1
-		else:
-			Helpers.throwError("Not assignment.", lineNumber)
-
-class BlockOfCommands():
-	cmdsList = []
-	def __init__(self) -> None:
-		pass
-
-	def run(self):
-		for i in range(0, len(self.cmdsList)):
-			self.cmdsList[i].run()
-
-	def parseBlock(self, sourceLines, lineNumber):
-		self.blockIndentation = Helpers.getStrIndentation(sourceLines[lineNumber])
-		while(Helpers.getStrIndentation(sourceLines[lineNumber]) == self.blockIndentation):
-			assCmd = AssignmentCommand()
-			nextLine = assCmd.parse()
-			if(nextLine != None):
-				self.cmdsList.append(assCmd)
-				lineNumber = nextLine
-				continue
-			ifCmd = IfCommand()
-			nextLine = ifCmd.parse()
-			if(nextLine != None):
-				self.cmdsList.append(ifCmd)
-				lineNumber = nextLine
-				continue
-			return None
+    def parse(self, sourceLines: list[str], lineNumber: int) -> int:
+        cmd = sourceLines[lineNumber]
+        regexPattern1 = f"^\s*({variableRegex}) = (-?\d+)\s*$"
+        regexResult1 = re.match(regexPattern1, cmd)
+        if regexResult1 is not None:
+            self.where_save = regexResult1.group(1)
+            varValue = regexResult1.group(2)
+            GlobalContext.globalVariables[self.where_save] = int(varValue)
+            return lineNumber + 1
+        # x = add y z
+        # TODO select which operations allowed
+        regexPattern2 = f"^\s*({variableRegex}) = ({operationsRegex}) ({variableRegex}) ({variableRegex})\s*$"
+        regexResult2 = re.match(regexPattern2, cmd)
+        if regexResult2 is not None:
+            self.where_save = regexResult2.group(1)
+            operation = regexResult2.group(2)
+            firstOperand = regexResult2.group(3)
+            secondOperand = regexResult2.group(4)
+            GlobalContext.globalVariables[self.where_save] = self.assignmentLambda[operation](
+                firstOperand, secondOperand)
+            # else:
+            #    Helpers.throwError("Bad operation", lineNumber)
+            return lineNumber + 1
+        Helpers.set_error(lineNumber)
+        raise RuntimeError('Not assignment.')
 
 
-def do_while(programSource):
-	program = Program(programSource)
-	program.create()
-	return program.run();
+class BlockOfCommands:
+    def __init__(self) -> None:
+        self.cmdsList: list[Command] = []
 
-programSrc = """x = 5"""
-do_while(programSrc)
+    def run(self) -> None:
+        for i in range(0, len(self.cmdsList)):
+            self.cmdsList[i].run()
+
+    def parseBlock(self, sourceLines: list[str], lineNumber: int) -> int:
+        blockIndentation = Helpers.getStrIndentation(sourceLines[lineNumber])
+        while lineNumber < len(sourceLines) and Helpers.getStrIndentation(sourceLines[lineNumber]) == blockIndentation:
+            assCmd = AssignmentCommand()
+            nextLine = assCmd.parse(sourceLines, lineNumber)
+            if nextLine is not None:
+                self.cmdsList.append(assCmd)
+                lineNumber = nextLine
+                continue
+            ifCmd = IfCommand()
+            nextLine = ifCmd.parse()
+            if nextLine is not None:
+                self.cmdsList.append(ifCmd)
+                lineNumber = nextLine
+                continue
+        return lineNumber
+
+
+def do_while(source: str) -> dict[str, int]:
+    program = Program(source)
+    try:
+        program.create()
+    except RuntimeError:
+        pass
+    program.run()
+    return GlobalContext.globalVariables
+
+
+if __name__ == '__main__':
+    programSource = """x = -5
+    y = 7
+    one = 1
+    y = sub x one
+    if x
+      x = add x x
+        if x
+          x = add x x"""
+    print(do_while(programSource))
