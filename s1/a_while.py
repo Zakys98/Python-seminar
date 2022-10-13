@@ -32,11 +32,11 @@
 # Valid operations are:
 #
 #  • logic: ‹and›, ‹or›, ‹nand› (the result is always 0 or 1),
-#  • arithmetic: ‹add›, ‹sub›, ‹mul›, ‹div›,
-#  • relational:
+#  • relational (result is again ‹0› or ‹1›):
 #    ◦ ‹lt›, ‹gt› (less/greater than),
 #    ◦ ‹eq› (equals),
-#    ◦ ‹leq› and ‹geq› (less/greater or equal).
+#    ◦ ‹leq› and ‹geq› (less/greater or equal),
+#  • arithmetic: ‹add›, ‹sub›, ‹mul›, ‹div›, ‹mod›.
 #
 # Example program:
 #
@@ -68,192 +68,287 @@
 #
 # Syntax errors may be due to malformed statements (e.g. ‹while x =
 # 1›, ‹x ++› above, etc.), or due to undefined operations (e.g. ‹x =
-# mod x y›). Report the first error (nearest to the top of the
+# fdiv x y›). Report the first error (nearest to the top of the
 # input). At runtime, detect and report any attempts to divide by
 # zero.
 
+
 from typing import Callable
 import re
-
-from rx import catch
 
 
 class GlobalContext:
     globalVariables: dict[str, int] = {}
 
-
-class Helpers:
     @staticmethod
-    def getStrIndentation(string: str) -> int:
-        # TODO if there is tab, throw error
-        return len(string) - len(string.lstrip())
-
-    @staticmethod
-    def checkVarName(name: str) -> bool:
-        location = re.search("^$", name)  # TODO not finished
-        if location == None:
-            return False
-        return True
+    def check_variable_exits(variable: str) -> None:
+        if variable not in GlobalContext.globalVariables:
+            GlobalContext.globalVariables[variable] = 0
 
     @staticmethod
     def set_error(whichLine: int) -> None:
         GlobalContext.globalVariables["#error"] = whichLine + 1
 
 
+def get_indentation(string: str) -> int:
+    # TODO if there is tab, throw error
+    return len(string) - len(string.lstrip())
+
+
 variableRegex = "[a-zA-Z][a-zA-Z0-9_]*"
-operationsRegex = "add|sub|mul|div|and|or|nand|lt|gt|eq|leq|geq"
+operationsRegex = "add|sub|mul|div|mod|and|or|nand|lt|gt|eq|leq|geq"
 
 
 class Program:
-    def __init__(self, sourceCode: str) -> None:
-        self.sourceLines = sourceCode.splitlines()
+    def __init__(self, source_code: str) -> None:
+        self.source_lines = source_code.splitlines()
         self.actual_line = 0
 
-    def create(self) -> None:
-        while self.actual_line < len(self.sourceLines):
-            cmd = self.sourceLines[self.actual_line].strip().split(' ')[0]
+    def run(self) -> None:
+        while self.actual_line < len(self.source_lines):
+            cmd = self.source_lines[self.actual_line].strip().split(' ')[0]
             if cmd == 'if':
                 if_cmd = IfCommand()
                 self.actual_line = if_cmd.parse(
-                    self.sourceLines, self.actual_line)
+                    self.source_lines, self.actual_line)
             elif cmd == 'while':
-                pass
+                while_cmd = WhileCommand()
+                self.actual_line = while_cmd.parse(
+                    self.source_lines, self.actual_line)
             else:
                 ass_cmd = AssignmentCommand()
                 self.actual_line = ass_cmd.parse(
-                    self.sourceLines, self.actual_line)
-
-    def run(self) -> None:
-        pass
+                    self.source_lines[self.actual_line], self.actual_line)
 
 
 class Command:
     def run(self) -> None:
         pass
 
+    def skip_lines(self, source_lines: list[str], actual_line: int) -> int:
+        indentation = get_indentation(source_lines[actual_line])
+        actual_line += 1
+        while True:
+            if actual_line >= len(source_lines):
+                return actual_line
+            if indentation >= get_indentation(source_lines[actual_line]):
+                return actual_line
+            actual_line += 1
+
 
 class WhileCommand(Command):
-    pass
+
+    def parse(self, source_lines: list[str], line_number: int) -> int:
+        cmd = source_lines[line_number]
+        pattern = f"\s*while ({variableRegex})\s*$"
+        reg_result = re.match(pattern, cmd)
+        if reg_result is None:  # just for mypy
+            GlobalContext.set_error(line_number)
+            raise RuntimeError
+        while_variable = reg_result.group(1)
+        GlobalContext.check_variable_exits(while_variable)
+
+        while_line = line_number
+        indentation = get_indentation(source_lines[line_number])
+        number_of_lines = len(source_lines)
+        while GlobalContext.globalVariables[while_variable] != 0:
+            line_number += 1
+            while line_number < number_of_lines and indentation < get_indentation(source_lines[line_number]):
+                cmd = source_lines[line_number].strip().split(' ')[0]
+                if cmd == 'if':
+                    if_cmd = IfCommand()
+                    line_number = if_cmd.parse(
+                        source_lines, line_number)
+                elif cmd == 'while':
+                    while_cmd = WhileCommand()
+                    line_number = while_cmd.parse(
+                        source_lines, line_number)
+                else:
+                    ass_cmd = AssignmentCommand()
+                    line_number = ass_cmd.parse(
+                        source_lines[line_number], line_number)
+            line_number = while_line
+        return super().skip_lines(source_lines, line_number)
 
 
 class IfCommand(Command):
-    conditionVar = ""
-    commandsBlock = None
 
-    #def run(self) -> None:
-    #    if(GlobalContext.globalVariables[self.conditionVar] != 0):
-    #       self.commandsBlock.run()
-
-    def parse(self, sourceLines: list[str], lineNumber: int) -> int:
-        cmd = sourceLines[lineNumber]
-        regexPattern = f"\s*if ({variableRegex})\s*$"
-        regexResult = re.match(regexPattern, cmd)
-        if regexResult is None:
-            Helpers.set_error(lineNumber)
-            raise RuntimeError('Not a condition format.')
-        self.conditionVar = regexResult.group(1)
-        # tenhle if tady asi nebude, kazda variable ma na zacatku 0
-        if self.conditionVar not in GlobalContext.globalVariables:
-            Helpers.set_error(lineNumber)
-            raise RuntimeError('Variable does not exist.')
-        self.commandsBlock = BlockOfCommands()
-        nextLine = self.commandsBlock.parseBlock(sourceLines, lineNumber + 1)
-
-        return nextLine
+    def parse(self, source_lines: list[str], actual_line: int) -> int:
+        pattern = f"\s*if ({variableRegex})\s*$"
+        reg_result = re.match(pattern, source_lines[actual_line])
+        if reg_result is None:  # just for mypy
+            GlobalContext.set_error(actual_line)
+            raise RuntimeError
+        variable = reg_result.group(1)
+        GlobalContext.check_variable_exits(variable)
+        if GlobalContext.globalVariables[variable] == 0:
+            return super().skip_lines(source_lines, actual_line)
+        return actual_line + 1
 
 
 class AssignmentCommand(Command):
 
     def __init__(self) -> None:
         super().__init__()
-        self.assignmentLambda: dict[str, Callable[[str, str], int]] = {
+        self.assignment_function: dict[str, Callable[[str, str], int]] = {
             'add': lambda first, second: GlobalContext.globalVariables[first] + GlobalContext.globalVariables[second],
             'sub': lambda first, second: GlobalContext.globalVariables[first] - GlobalContext.globalVariables[second],
             'mul': lambda first, second: GlobalContext.globalVariables[first] * GlobalContext.globalVariables[second],
             'div': lambda first, second: GlobalContext.globalVariables[first] // GlobalContext.globalVariables[second],
-            'and': lambda first, second: GlobalContext.globalVariables[first] and GlobalContext.globalVariables[second],
-            'or': lambda first, second: GlobalContext.globalVariables[first] or GlobalContext.globalVariables[second],
-            'nand': lambda first, second: not(GlobalContext.globalVariables[first] and GlobalContext.globalVariables[second]),
-            'lt': lambda first, second: GlobalContext.globalVariables[first] < GlobalContext.globalVariables[second],
-            'gt': lambda first, second: GlobalContext.globalVariables[first] > GlobalContext.globalVariables[second],
-            'eq': lambda first, second: GlobalContext.globalVariables[first] == GlobalContext.globalVariables[second],
-            'leq': lambda first, second: GlobalContext.globalVariables[first] <= GlobalContext.globalVariables[second],
-            'geq': lambda first, second: GlobalContext.globalVariables[first] >= GlobalContext.globalVariables[second]
+            'mod': lambda first, second: GlobalContext.globalVariables[first] % GlobalContext.globalVariables[second],
+            'and': lambda first, second: int(bool(GlobalContext.globalVariables[first] and GlobalContext.globalVariables[second])),
+            'or': lambda first, second: int(bool(GlobalContext.globalVariables[first] or GlobalContext.globalVariables[second])),
+            'nand': lambda first, second: int(bool(not(GlobalContext.globalVariables[first] and GlobalContext.globalVariables[second]))),
+            'lt': lambda first, second: int(GlobalContext.globalVariables[first] < GlobalContext.globalVariables[second]),
+            'gt': lambda first, second: int(GlobalContext.globalVariables[first] > GlobalContext.globalVariables[second]),
+            'eq': lambda first, second: int(GlobalContext.globalVariables[first] == GlobalContext.globalVariables[second]),
+            'leq': lambda first, second: int(GlobalContext.globalVariables[first] <= GlobalContext.globalVariables[second]),
+            'geq': lambda first, second: int(GlobalContext.globalVariables[first] >= GlobalContext.globalVariables[second])
         }
 
-    # def run(self) -> None:
-    #    GlobalContext.globalVariables[self.where_save] = self.assignmentLambda()
+    def parse(self, command: str, actual_line: int) -> int:
+        pattern = f"^\s*({variableRegex}) = (-?\d+)\s*$"
+        reg_result = re.match(pattern, command)
+        if reg_result is not None:
+            where_save = reg_result.group(1)
+            varValue = reg_result.group(2)
+            GlobalContext.globalVariables[where_save] = int(varValue)
+            return actual_line + 1
 
-    def parse(self, sourceLines: list[str], lineNumber: int) -> int:
-        cmd = sourceLines[lineNumber]
+        pattern = f"^\s*({variableRegex}) = ({operationsRegex}) ({variableRegex}) ({variableRegex})\s*$"
+        reg_result = re.match(pattern, command)
+        if reg_result is not None:
+            where_save = reg_result.group(1)
+            operation = reg_result.group(2)
+            firstOperand = reg_result.group(3)
+            secondOperand = reg_result.group(4)
+            GlobalContext.check_variable_exits(firstOperand)
+            GlobalContext.check_variable_exits(secondOperand)
+            if (operation == 'div' or operation == 'mod') and GlobalContext.globalVariables[secondOperand] == 0:
+                GlobalContext.set_error(actual_line)
+                raise RuntimeError
+            GlobalContext.globalVariables[where_save] = self.assignment_function[operation](
+                firstOperand, secondOperand)
+        return actual_line + 1
+
+
+class Syntax:
+    def __init__(self, source_code: str) -> None:
+        self.source_lines = source_code.splitlines()
+        self.actual_line = 0
+        self.starting_indentation = get_indentation(
+            self.source_lines[self.actual_line])
+        self.actual_indentation = self.starting_indentation
+
+    def check(self) -> None:
+        while self.actual_line < len(self.source_lines):
+            self._check_indentation()
+            cmd = self.source_lines[self.actual_line].strip().split(' ')[0]
+            if cmd == 'if':
+                self._check_if()
+            elif cmd == 'while':
+                self._check_while()
+            else:
+                self._check_asignment()
+            self.actual_line += 1
+
+    def _check_indentation(self) -> None:
+        indentation = get_indentation(self.source_lines[self.actual_line])
+        if indentation > self.actual_indentation or indentation < self.starting_indentation:
+            GlobalContext.set_error(self.actual_line)
+            raise RuntimeError
+        elif indentation < self.actual_indentation:
+            self.actual_indentation = indentation
+
+    def _check_line(self, pattern: str) -> None:
+        regexResult = re.match(pattern, self.source_lines[self.actual_line])
+        if regexResult is None:
+            GlobalContext.set_error(self.actual_line)
+            raise RuntimeError
+        self.actual_indentation += 1
+
+    def _check_if(self) -> None:
+        self._check_line(f"\s*if ({variableRegex})\s*$")
+
+    def _check_while(self) -> None:
+        self._check_line(f"\s*while ({variableRegex})\s*$")
+
+    def _check_asignment(self) -> None:
+        cmd = self.source_lines[self.actual_line]
         regexPattern1 = f"^\s*({variableRegex}) = (-?\d+)\s*$"
         regexResult1 = re.match(regexPattern1, cmd)
         if regexResult1 is not None:
-            self.where_save = regexResult1.group(1)
-            varValue = regexResult1.group(2)
-            GlobalContext.globalVariables[self.where_save] = int(varValue)
-            return lineNumber + 1
-        # x = add y z
-        # TODO select which operations allowed
+            return
         regexPattern2 = f"^\s*({variableRegex}) = ({operationsRegex}) ({variableRegex}) ({variableRegex})\s*$"
         regexResult2 = re.match(regexPattern2, cmd)
         if regexResult2 is not None:
-            self.where_save = regexResult2.group(1)
-            operation = regexResult2.group(2)
-            firstOperand = regexResult2.group(3)
-            secondOperand = regexResult2.group(4)
-            GlobalContext.globalVariables[self.where_save] = self.assignmentLambda[operation](
-                firstOperand, secondOperand)
-            # else:
-            #    Helpers.throwError("Bad operation", lineNumber)
-            return lineNumber + 1
-        Helpers.set_error(lineNumber)
-        raise RuntimeError('Not assignment.')
-
-
-class BlockOfCommands:
-    def __init__(self) -> None:
-        self.cmdsList: list[Command] = []
-
-    def run(self) -> None:
-        for i in range(0, len(self.cmdsList)):
-            self.cmdsList[i].run()
-
-    def parseBlock(self, sourceLines: list[str], lineNumber: int) -> int:
-        blockIndentation = Helpers.getStrIndentation(sourceLines[lineNumber])
-        while lineNumber < len(sourceLines) and Helpers.getStrIndentation(sourceLines[lineNumber]) == blockIndentation:
-            assCmd = AssignmentCommand()
-            nextLine = assCmd.parse(sourceLines, lineNumber)
-            if nextLine is not None:
-                self.cmdsList.append(assCmd)
-                lineNumber = nextLine
-                continue
-            ifCmd = IfCommand()
-            nextLine = ifCmd.parse()
-            if nextLine is not None:
-                self.cmdsList.append(ifCmd)
-                lineNumber = nextLine
-                continue
-        return lineNumber
+            return
+        GlobalContext.set_error(self.actual_line)
+        raise RuntimeError
 
 
 def do_while(source: str) -> dict[str, int]:
+    GlobalContext.globalVariables.clear()
+    syntax = Syntax(source)
     program = Program(source)
     try:
-        program.create()
+        syntax.check()
+        program.run()
     except RuntimeError:
         pass
-    program.run()
     return GlobalContext.globalVariables
 
 
 if __name__ == '__main__':
     programSource = """x = -5
-    y = 7
-    one = 1
-    y = sub x one
-    if x
-      x = add x x
-        if x
-          x = add x x"""
-    print(do_while(programSource))
+y = 7
+one = 1
+y = sub x one
+r = sub xe po
+if x
+ x = add x x
+ if x
+  x = add x x
+z = 2"""
+
+    a = """a = 5
+b = 1
+x = add x x
+if a
+ a = 0
+while x
+ if x
+  e = 2
+  s = 2
+  x = add x x
+ t = 0"""
+    b = """x = 1
+while x
+x ++"""
+    c = """   x = 1
+   c = 0
+   if x
+    a = 4
+    l = 1
+    if c
+   q = 2"""
+    d = """a = 2
+one = 1
+z = 0
+while a
+ a = sub a one
+ if one
+  a = 0
+c = 4
+"""
+    e = """  a = 5
+  b = 3
+  c = mod a b
+  zero = 0
+  if zero
+  d = 4"""
+    l = """  x = add x x"""
+    s = """ x = 2
+ z = add x y"""
+    print(do_while(s))
+    print(do_while(l))
