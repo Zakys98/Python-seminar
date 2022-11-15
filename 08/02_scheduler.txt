@@ -1,0 +1,120 @@
+## An ‹async› Scheduler
+
+Syntactic restrictions on ‹async def› mean that it isn't possible to
+use them normally (via ‹await›) from the toplevel, nor from standard
+functions. Usually, the missing piece is provided by a library
+(‹asyncio› in most cases): to transition from the world of functions
+to the world of coroutines, you need a standard function to which
+you can pass a coroutine. One such function is ‹asyncio.run›, but
+it's entirely possible to write such function with what we already
+know. Of course, the other way (calling normal functions from
+‹async› coroutines) works fine (with some caveats related to
+latency).
+
+However, ‹asyncio.run› is not simply glue that lets you call an
+‹async› coroutine from a normal function – that wouldn't be very
+useful. Nonetheless, let's have a look at this minimal glue, for
+future reference:
+
+    try:                                            # python
+        while True:
+            next( coro )
+    except StopIteration as e:
+        return e.value
+
+We will have to refine that, because nothing interesting is
+happening above: all values that were yielded are ignored and the
+suspended coroutine is immediately woken up again. We need to add
+two things to make it actually useful:
+
+ 1. we need to be able to switch between coroutines (that's the
+    entire point of the exercise, after all),
+ 2. we need to react to the values that the other magic half (which
+    typically comes from the same library, so in this case from us)
+    yields (all the intermediate ‹async def› coroutines just forward
+    it, until it reaches the schedule).
+
+Let's start with the second part. Schematically:
+
+    result = None                                   # python
+    while True:
+        try:
+            request = coro.send( result )
+            result = process( request )
+        except StopIteration as e:
+            return e.value
+
+The heavy lifting is done by ‹process›, but we are not really
+interested in the details of that. In ‹asyncio›, the requests are IO
+requests and ‹process› dispatches those IO requests to the operating
+system. We will discuss that in more detail another week. For a more
+complete sketch, see ‹d1_request›.
+
+The other half of scheduler's job is implementing «fibres», or green
+threads. Notable features of fibres are:
+
+ 1. The most important feature of fibres is that they are «cheap»,
+    in the sense you can make lots of them, and switching from one
+    to the next is also cheap. This is universally true across many
+    languages that provide them.
+ 2. Python brings another feature with its implementation of fibres:
+    the only place where a fibre can be interrupted (suspended) is
+    during an ‹await›. This makes concurrency much easier to deal
+    with, because it is immediately obvious where a thread might be
+    suspended and another might be resumed. There is no parallelism:
+    at any given time, at most a single fibre is executing. A data
+    race is only possible if you split a complex update of a shared
+    data structure across an ‹await› – something that is much harder
+    to do by accident than, say, forgetting to lock a mutex.
+ 3. Combined with ‹asyncio›¹, fibres can provide «IO parallelism»
+    where multiple IO requests from multiple fibres are processed in
+    parallel by the low-level IO loop. The actual Python code still
+    runs sequentially, but since IO causes a lot of latency, using
+    the delays while IO is executing in the OS to run other fibres
+    can considerably improve overall throughput, and/or per-client
+    latency in applications with multiple client connections.
+
+To get fibres, we need to be able to do two things, essentially:
+
+ 1. suspend an entire coroutine stack, which is easily done: ‹await›
+    already propagates a ‹yield› from special methods all the way to
+    the scheduler,
+ 2. put suspended coroutines on a queue (or into a system of queues)
+    – again easily done, since suspended coroutines are just
+    regular, inert objects and can be put into a ‹list› or a ‹deque›
+    like any other object,
+ 3. pick and resume a particular fibre from the queue: this is done
+    by calling ‹next› or ‹send› on the coroutine object that we
+    picked from the queue.
+
+The system of queues is usually arranged the same way an OS
+scheduler is: there is a run queue for fibres that are ready to
+execute (i.e. they are not waiting for any IO operation), and then
+additional queues are created for resources that can block the
+execution of a fibre (whether it is a synchronisation device, a
+communication queue or an IO operation). Whenever the resource
+becomes available, the fibre is moved to the run queue and
+eventually resumed.
+
+The only thing that remains is that we need to be able to actually
+«create» new fibres. But since fibres are nothing but stacks of
+suspended coroutines, we can create a new one by creating a
+coroutine object (by calling a coroutine function, aka an ‹async›
+function) and sending the result to the scheduler using a ‘please
+put this on your queue’ request. Along the lines of:
+
+    async def fibre():                              # python
+        pass # do stuff here
+    
+    async def main():
+        coro = fibre()            # create a suspended coroutine
+        await async_spawn( coro ) # send it to the scheduler
+
+The implementation of ‹async_spawn› is then straightforward. For a
+worked example, see ‹d3_spawn›.
+
+¹ Notably, ‹asyncio› is more or less modelled after ‹node.js›, which
+  is itself modelled after the IO loop used in traditional,
+  single-threaded UNIX daemons. This approach to concurrency has a
+  long tradition, but the introduction of ‹node.js› and ‹asyncio›
+  made it considerably easier to use.

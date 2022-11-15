@@ -1,0 +1,115 @@
+## Generators
+
+Before confronting coroutines in their full generality, we will make
+a stop at so-called «generators», or «semi-coroutines». This puts us
+on a middle rung of three stages of generalisation:
+
+ 1. functions can call any number of other functions; they may run
+    forever or they eventually return to their caller «once»,
+ 2. generators / semi-coroutines differ by the ability to «return
+    more than once», but again only to their caller – in this
+    context, the ‘returning’ is called «yielding» because they can
+    continue executing if «resumed»,
+ 3. full coroutines can «yield» into arbitrary other coroutines –
+    they are not restricted to keep returning into their ‘caller’.
+
+Before we go on, it is important to note that coroutines provide
+additional «expressive power» – they make certain things much easier
+to write – but in principle, they can be always simulated with
+functions and explicit state (or more conveniently using objects).¹
+
+In some sense, generators represent a ‘sweet spot’ between
+expressiveness and intuitiveness: full coroutines can be very hard
+to grasp (i.e. they can be very unintuitive), even though they
+provide additional power over generators. On the other hand,
+generators can provide a huge benefit in both readability and in
+ease of writing a particular piece of code.² We will have some
+opportunities to contrast explicit iterators with generators and the
+improvements the latter can yield (excuse the pun).
+
+So how do we represent multiple ‘returns’ from a function? If these
+returns are all into the caller (as is the case with generators), we
+can think of the values that are being returned as a sequence, or a
+stream. It is not a coincidence that iterators and generators are
+closely related.
+
+A common pattern for using generators is this:
+
+ 1. call into the generator to obtain a value,
+ 2. process the value,
+ 3. resume the generator to obtain another value,
+ 4. repeat until the generator is exhausted.
+
+This does look an awful lot like iteration, and that is exactly how
+generators are commonly used in Python – the result of a generator
+function is automatically iterable (in fact, an «iterator») and as
+such can be used in a ‹for› loop.
+
+Like we did with iterators, we need to clear up some terminology:
+
+ • a «generator function» is what looks like a regular function
+   except that it uses a ‹yield› keyword; when called, a generator
+   function «returns immediately» and the result is
+ • a «generator», which is an object that represents a «suspended
+   coroutine» – it is this generator object that can be iterated.
+
+Or, using an example:
+
+    def make_gen():                                    # python
+        print( 'this is gen' )
+        yield 3
+    
+    gen = make_gen()
+
+In this piece of code, ‹make_gen› is a «generator function» while
+‹gen› is a «generator». As written, the code «does not print
+anything»: the body of the generator function does not start
+executing at the time it is called. Instead, it is captured as a
+generator object and returned to the caller. This is very closely
+related to how lexical closures arise. Compare:
+
+    def make_fun():                                    # python
+        def fun():
+            print( 'this is fun' )
+            return 3
+        return fun
+    
+    fun = make_fun()
+
+The result in this case is a «function object» (i.e. a lexical
+closure), while it was a «generator object» in the generator case
+above. In both cases, to actually perform the code, the ‹gen› /
+‹fun› object needs to be used. How that is done of course differs:
+to use ‹fun›, we simply call it: ‹fun()›. With ‹gen›, we instead
+iterate it – Python has provided a built-in ‹__next__› method for
+the generator object (just like it provided a ‹__call__› method for
+the function object) that interacts with the coroutine:
+
+ 1. calling ‹next› resumes the coroutine,
+ 2. if a ‹yield› is encountered, the coroutine is suspended and
+    ‹next› returns the yielded value,
+ 3. if a ‹return› is encountered, the coroutine is destroyed, its
+    return value is wrapped in a ‹StopIteration› object and raised
+    by ‹next›.
+
+Since ‹for› ignores the value inside ‹StopIteration›, in most
+situations, the return value (as opposed to values passed to
+‹yield›) is worthless. Nonetheless, it can be obtained when a
+generator is used directly, though this is not common.
+
+¹ Of course, any program you can write using coroutines, you can
+  rewrite without them. This is true of essentially all abstractions
+  in all programming languages – all you really need to compute
+  anything that can be computed is 2 unlimited counters and a
+  conditional ‹goto›. By comparison, even Turing machines have
+  awfully rich semantics.
+
+² Code readability is a struggle between two opposing forces:
+  readable code must be both «simple» (intuitive) but also
+  «succinct» – code that is simple but long-winded is «not»
+  readable, because the reader cannot hold all of it in their
+  short-term ‘working’ memory. More abstraction usually means
+  shorter code, but also more complicated. And since expressive
+  power is really a measure of abstraction, a language that is ‘too
+  powerful’ is just as bad as a language that is not powerful
+  enough. Hence the seeking of middle ground.

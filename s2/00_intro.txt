@@ -1,0 +1,14 @@
+# S.2. Interpreters, Coroutines
+
+In this set, there are 2 interpreters of simple languages – one with
+recursion and closures, another with explicit pointers and garbage
+collection. The third task explores an extension of the game solver
+from the first set (did you know that generators can be used to
+nicely encode backtracking?), while the fourth task is focused on
+the use of semi-coroutines (generators) in a latency-sensitive
+context.
+
+ 1. ‹a_rec›     – recursive programs
+ 2. ‹b_ptr›     – pointers and garbage collection
+ 3. ‹c_gravity› – same game, iteration 2
+ 4. ‹d_rst›     – real-time splay trees

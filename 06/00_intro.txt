@@ -1,0 +1,27 @@
+# Objects 2
+
+Demonstrations:
+
+ 1. (to be done)
+
+Practice exercises:
+
+ 1. ‹poly›     – polynomials with operator overloading
+ 2. ‹mod›      – finite rings (integers mod N)
+ 3. ‹noexcept› – turn exceptions into ‹None› returns
+ 4. ‹with›     – a simple context manager
+ 5. ‹numeric›  – a simple meta-class exercise
+ 6. ‹record›   – ‘data classes’ using data descriptors
+
+Regular exercises:
+
+ 1. ‹trace›    – advanced print debugging
+ 2. ‹profile›  – a very simple profiler
+ 3. ‹record›   – more data classes
+ 4. ‹array›    – array with automatic resizing
+ 5. ‹bitset›   – a compact set of small integers
+ 6. ‹undo›     – a data descriptor with a history
+
+Voluntary exercises:
+
+ 1. (nothing here yet)

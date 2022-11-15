@@ -233,7 +233,6 @@ class Animal:
                 return True
         return False
 
-    # TODO udelat kontrolu mezi date_of_entry a year_of_birth
     def adopt(self, date: date, adopter_name: Optional[str] = None, adopter_address: Optional[str] = None) -> None:
         self._check_foster_care(date)
         for foster in self.foster_cares:
@@ -242,7 +241,7 @@ class Animal:
         for exam in self.exams:
             if exam.date >= date:
                 raise RuntimeError
-        if self.date_of_adopt is not None or self.date_of_entry > date: #or self.year_of_birth > date.year \
+        if self.date_of_adopt is not None or self.date_of_entry > date:
             raise RuntimeError
         if adopter_name is not None:
             self.adopter = Adopter(adopter_name, adopter_address)
@@ -252,6 +251,9 @@ class Animal:
         self._check_foster_care(date)
         if end_date is not None:
             self._check_foster_care(end_date)
+            if self.date_of_adopt is not None:
+                if self.date_of_adopt <= date or self.date_of_adopt <= end_date:
+                    raise RuntimeError
             for foster in self.foster_cares:
                 if foster.end is not None and foster.start >= date and foster.end <= end_date:
                     raise RuntimeError
@@ -259,10 +261,7 @@ class Animal:
             for foster in self.foster_cares:
                 if foster.end is None:
                     raise RuntimeError
-        if self.date_of_adopt is not None:
-            if self.date_of_adopt <= date:
-                raise RuntimeError
-            if end_date is not None and self.date_of_adopt <= end_date:
+            if self.date_of_adopt is not None:
                 raise RuntimeError
         if not parent.is_under_max_limit(date):
             raise RuntimeError
@@ -271,6 +270,11 @@ class Animal:
         self.foster_cares.append(foster_care)
 
     def end_foster(self, date: date) -> None:
+        for foster in self.foster_cares:
+            if foster.start <= date and foster.end is not None and foster.end >= date:
+                raise RuntimeError
+            if foster.end is None and date < foster.start:
+                raise RuntimeError
         for foster in self.foster_cares:
             if foster.end is None:
                 foster.end = date

@@ -1,0 +1,27 @@
+# Iterators, Coroutines
+
+Demonstrations:
+
+ 1. (to be done)
+
+Practice exercises in this chapter:
+
+ 1. ‹flat›    – flattening nested data with generators
+ 2. ‹send›    – understanding full coroutines
+ 3. ‹getline› – coroutine-based data streams
+ 4. ‹lexer›   – more streams
+ 5. ‹parser›  – coroutine-based lexer + parser combination
+ 6. ‹mbox›    – event-based (SAX-like) parsing with coroutines
+
+Regular exercises:
+
+ 1. ‹iscan›   – iterator-based scanning
+ 2. ‹gscan›   – similar, but with generators
+ 3. ‹itree›   – iterating a binary tree
+ 4. ‹gtree›   – generators vs trees
+ 5. ‹dfs›     – walking graphs with coroutines
+ 6. ‹guided›  – A* search with coroutines
+
+Voluntary exercises:
+
+ 1. (nothing here yet)

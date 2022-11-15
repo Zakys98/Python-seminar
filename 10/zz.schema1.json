@@ -1,0 +1,16 @@
+{
+    "package":
+    {
+        "id": "integer",
+        "name": "varchar"
+    },
+    "version":
+    {
+        "package_id": "integer"
+    },
+    "depends":
+    {
+        "version_id": "integer",
+        "depends_on": "integer"
+    }
+}

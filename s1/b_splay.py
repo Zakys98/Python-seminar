@@ -14,7 +14,7 @@
 # ‹SplayTree›.
 
 # You can find the required algorithms online (wikipedia comes to
-# mind, but also check out ‹https://is.muni.cz/go/ssyj4d› for some
+# mind, but also check out ‹https://is.muni.cz/go/uvcjn9› for some
 # intuition how the tree works).
 
 # The main operation is ‘splaying’ the tree, which moves a
@@ -32,7 +32,7 @@
 #  1. splay the to-be-deleted node to the root, then
 #  2. join its two subtrees L and R:
 #     ◦ use splay again, this time on the largest item of the
-#       left subtree L,
+#       left subtree L,
 #     ◦ the new root of L clearly can't have a right child,
 #     ◦ attach the subtree R in place of the missing child.
 

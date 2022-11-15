@@ -25,60 +25,77 @@
 # the new item in the output.
 
 
-def sort_by( data, order ):   pass
-def group_by( data, eq_rel ): pass
-def nub_by( data, eq_rel ):   pass
+def sort_by(data, order):
+    output = data[:]
+    for i, item in enumerate(output):
+        for j, change in enumerate(output):
+            if order(item, change):
+                #print(item)
+                ##print(change)
+                #if isinstance(item, tuple):
+                #    if
+                output[i], output[j] = output[j], output[i]
+    return output
+
+def group_by(data, eq_rel): pass
+def nub_by(data, eq_rel): pass
 
 
 def test_sort_1() -> None:
 
-    data = [ 4, 5, 8, 1, 0, 0, 2 ]
-    res = sort_by( data, lambda x, y: y <= x )
-    assert res == [ 8, 5, 4, 2, 1, 0, 0 ]
+    data = [4, 5, 8, 1, 0, 0, 2]
+    res = sort_by(data, lambda x, y: y <= x)
+    assert res == [8, 5, 4, 2, 1, 0, 0]
+
 
 def test_sort_2() -> None:
-    data = [ { 'a': 7, 'b': 3, 'c': 10 },
-             { 'a': 17, 'd': 0, 'c': 9 },
-             { 'a': 5, 'e': 0, 'c': -2 } ]
-    res = sort_by( data, lambda x, y: ( x['a'] + x['c'] ) <= ( y['a'] + y['c'] ) )
-    assert len( res ) == 3
-    assert all( list( map( lambda x: type( x ) == dict, res ) ) )
+    data = [{'a': 7, 'b': 3, 'c': 10},
+            {'a': 17, 'd': 0, 'c': 9},
+            {'a': 5, 'e': 0, 'c': -2}]
+    res = sort_by(data, lambda x, y: (x['a'] + x['c']) <= (y['a'] + y['c']))
+    assert len(res) == 3
+    assert all(list(map(lambda x: type(x) == dict, res)))
 
-    assert 'e' in res[ 0 ]
-    assert 'b' in res[ 1 ]
-    assert 'd' in res[ 2 ]
-    assert list( map( lambda x: x['a'] + x['c'], res ) ) == [ 3, 17, 26 ]
+    assert 'e' in res[0]
+    assert 'b' in res[1]
+    assert 'd' in res[2]
+    assert list(map(lambda x: x['a'] + x['c'], res)) == [3, 17, 26]
 
 
 def test_stable() -> None:
-    data = [ (1, 'f'), (2, 'b'), (3, 'c'), (2, 'd'), (1, 'e') ]
-    res = sort_by( data, lambda x, y: x[0] <= y[0] )
-    assert res == [ (1, 'f'), (1, 'e'), (2, 'b'), (2, 'd'), (3, 'c') ]
+    data = [(1, 'f'), (2, 'b'), (3, 'c'), (2, 'd'), (1, 'e')]
+    res = sort_by(data, lambda x, y: x[0] <= y[0])
+    print(res)
+    assert res == [(1, 'f'), (1, 'e'), (2, 'b'), (2, 'd'), (3, 'c')]
+
 
 def test_group_1() -> None:
-    data = [ 1, 5, 9, 10, 2, 4, 2, 2, 5, 7, 3, 2 ]
-    res = group_by( data, lambda x, y: x % 2 == y % 2 )
-    assert res == [ [ 1, 5, 9 ], [ 10, 2, 4, 2, 2 ],
-                    [ 5, 7, 3 ], [ 2 ] ], res
+    data = [1, 5, 9, 10, 2, 4, 2, 2, 5, 7, 3, 2]
+    res = group_by(data, lambda x, y: x % 2 == y % 2)
+    assert res == [[1, 5, 9], [10, 2, 4, 2, 2],
+                   [5, 7, 3], [2]], res
+
 
 def test_group_2() -> None:
-    data = [ "abc", "banana", "random", "abduct", "conduct",
-             "moon", "sane", "ablaze", "start" ]
-    res = group_by( data, lambda x, y: x[ 1 ] == y[ 1 ] )
-    assert res == [ [ "abc" ], [ "banana", "random" ],
-                    [ "abduct" ], [ "conduct", "moon" ],
-                    [ "sane" ], [ "ablaze" ], [ "start" ] ], res
+    data = ["abc", "banana", "random", "abduct", "conduct",
+            "moon", "sane", "ablaze", "start"]
+    res = group_by(data, lambda x, y: x[1] == y[1])
+    assert res == [["abc"], ["banana", "random"],
+                   ["abduct"], ["conduct", "moon"],
+                   ["sane"], ["ablaze"], ["start"]], res
+
 
 def test_nub_1() -> None:
-    data = [ 1, 5, 2, 0, 9, 10, 2, 4, 3 ]
-    res = nub_by( data, lambda x, y: x % 3 == y % 3 )
-    assert res == [ 1, 5, 0 ]
+    data = [1, 5, 2, 0, 9, 10, 2, 4, 3]
+    res = nub_by(data, lambda x, y: x % 3 == y % 3)
+    assert res == [1, 5, 0]
+
 
 def test_nub_2() -> None:
-    data = [ "abc", "banana", "abduct", "random", "conduct",
-             "moon", "sane", "ablaze", "start" ]
-    res = nub_by( data, lambda x, y: x[1] == y[1] )
-    assert res == [ "abc", "banana", "conduct", "start" ]
+    data = ["abc", "banana", "abduct", "random", "conduct",
+            "moon", "sane", "ablaze", "start"]
+    res = nub_by(data, lambda x, y: x[1] == y[1])
+    assert res == ["abc", "banana", "conduct", "start"]
 
 
 if __name__ == "__main__":

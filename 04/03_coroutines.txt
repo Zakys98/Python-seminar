@@ -1,0 +1,90 @@
+## Coroutines
+
+As explained earlier, coroutines can be understood as a further
+generalisation of generators. In fact, what Python calls a generator
+turns out to be, almost by accident, a full coroutine. Like in case
+of lexical closures, this is the result of a ‘conspiracy’ of a few
+seemingly unrelated features:
+
+ 1. generators exist, obviously,
+ 2. suspended generators are first-class objects,
+ 3. generators actually return into the caller of ‹next›.
+
+The second point has been made implicitly earlier: a «generator
+function» returns a «generator object» and the latter is the
+requisite first-class representation of a suspended generator.
+
+Now recall that in the initial definitions, we have demanded that
+semi-coroutines (generators) can return multiple times into their
+«caller». But in Python, this is coincidental: the generator returns
+into the function that called ‹next› – and usually, that is indeed
+the caller, because generators are «normally» used directly in a
+‹for› loop. But since we can pass the suspended coroutine around,
+anyone can call ‹next› and the next ‹yield› in the coroutine's body
+will transfer control back to the caller of ‹next›, not to the
+original caller of the coroutine. Again, it is purely by convention
+that these two functions are usually the same.
+
+Then there is an added bonus: suspended generators can be resumed by
+calling their ‹send› built-in method, instead of using ‹next›. In
+fact, ‹next( coro )› is equivalent to ‹coro.send( None )›. What does
+it do is that the ‹yield› on which the coroutine was previously
+suspended «returns a value». Specifically, it returns whatever was
+given to ‹send› as an argument.¹ And while this ability is not
+strictly necessary (we can send values from one coroutine to the
+next by other means), it makes using Python generators as ‘full’
+coroutines a bit more convenient.
+
+So what does all this mean in practice? We already have some
+experience with lexical closures, which are functions with some
+additional «captured state». Generators are like that, except they
+also remember a sort of ‘return address’ – in this case, an address
+which tells the interpreter where to continue executing the
+coroutine when it is resumed. Since all local variables of the
+«generator function» are, by construction, used by the «generator
+object», the generator object really keeps the entire frame of its
+‘parent’ function:
+
+    def make_gen():                                    # python
+        print( 'hello' )
+        x = 1
+        yield x
+        x += 1
+        yield x
+    
+    gen = make_gen()
+    next( gen )
+
+And the corresponding picture, at the point right after the last
+statement above:
+
+   ┌───────┐            code         ┌───────────┐
+   │  gen  │────────────────────────▶│ ‹print…›  │
+   └───────┘                         ├┄┄┄┄┄┄┄┄┄┄┄┤
+       │                             │ ‹x = 1›   │
+       │ frame  ┌───────────┐        ├┄┄┄┄┄┄┄┄┄┄┄┤
+       └───────▶│ return to │┄┄┄┄┄┄┄▶│ ‹yield x› │
+                ├───────────┤        ├┄┄┄┄┄┄┄┄┄┄┄┤
+                │ ‹x›       │─┐      │ ‹x += 1›  │
+                └───────────┘ │      ├┄┄┄┄┄┄┄┄┄┄┄┤
+                        ┌───┐ │      │ ‹yield x› │
+                        │ 1 │◀┘      └───────────┘
+                        └───┘
+
+And after calling ‹next( gen )› a second time (changes are
+«highlighted»):
+
+   ┌───────┐            code         ┌───────────┐
+   │  gen  │────────────────────────▶│ ‹print…›  │
+   └───────┘                         ├┄┄┄┄┄┄┄┄┄┄┄┤
+       │                             │ ‹x = 1›   │
+       │ frame  ┌───────────┐        ├┄┄┄┄┄┄┄┄┄┄┄┤
+       └───────▶│«return to»│┄┄┄┄┐   │ ‹yield x› │
+                ├───────────┤    ┆   ├┄┄┄┄┄┄┄┄┄┄┄┤
+                │ ‹x›       │─┐  ┆   │ ‹x += 1›  │
+                └───────────┘ │  ┆   ├┄┄┄┄┄┄┄┄┄┄┄┤
+                        ┌───┐ │  └┄┄▶│ ‹yield x› │
+                        │«2»│◀┘      └───────────┘
+                        └───┘
+
+¹ See the demos for an executable example.

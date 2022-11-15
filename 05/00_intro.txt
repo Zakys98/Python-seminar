@@ -1,0 +1,30 @@
+# Memory management, reference counting
+
+Please note that the content of this chapter might change
+considerably before it comes up.
+
+Demonstrations:
+
+ 1. (to be added)
+
+Practice exercises:
+
+ 1. ‹refcnt›  – a reference counting manager
+ 2. ‹final›   – deterministic object finalization
+ 3. ‹reach›   – reachability from a set of roots
+ 4. ‹sweep›   – a mark and sweep collector
+ 5. ‹malloc›  – low-level memory management
+ 6. ‹trace›   – tracing composite objects
+
+Regular exercises:
+
+ 1. ‹refcnt› – reference counting with data
+ 2. ‹reach›  – reachability again
+ 3. ‹sweep›  – mark and sweep v2
+ 4. ‹semi›   – a copying ‘semi-space’ collector
+ 5. ‹cheney› – improved version of the same
+ 6. ‹python› – reference counting + mark & sweep
+
+Voluntary exercises:
+
+ 1. (nothing here yet)

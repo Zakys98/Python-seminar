@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Callable, Dict
 
 # Your task is to write a function which takes:
 #
@@ -13,55 +13,66 @@ from typing import Dict
 # files left to right. Later files may be overwritten due to
 # processing of earlier files.
 
-def with_files( files, get_name, fun ): pass
+
+def with_files(files: list[str], get_name: Callable[[str], str], fun: Callable[[str], str]) -> None:
+    for file in files:
+        with open(file, 'r') as f:
+            content = f.read()
+        content = fun(content)
+        with open(get_name(file), 'w') as f:
+            f.write(content)
 
 
 def test_ident() -> None:
-    ident = lambda x: x
-    was   = lambda x: x.replace( 'is', 'was' )
+    def ident(x): return x
+    def was(x): return x.replace('is', 'was')
 
     files = prepare()
-    check_files( files )
-    with_files( list( files.keys() ), ident, was )
-    check_files( { k: v.replace( 'is', 'was' )
-                   for k, v in files.items() } )
+    check_files(files)
+    with_files(list(files.keys()), ident, was)
+    check_files({k: v.replace('is', 'was')
+                 for k, v in files.items()})
+
 
 def test_copy() -> None:
-    mktmp = lambda x: x + '.tmp'
-    ident = lambda x: x
+    def mktmp(x): return x + '.tmp'
+    def ident(x): return x
 
     files = prepare()
-    check_files( files )
-    with_files( list( files.keys() ), mktmp, ident )
-    check_files( files )
-    check_files( { k + '.tmp': v for k, v in files.items() } )
+    check_files(files)
+    with_files(list(files.keys()), mktmp, ident)
+    check_files(files)
+    check_files({k + '.tmp': v for k, v in files.items()})
+
 
 def test_change() -> None:
-    mktmp = lambda x: x + '.tmp'
-    pile  = lambda x: x.replace( 'file', 'pile' )
-    ident = lambda x: x
+    def mktmp(x): return x + '.tmp'
+    def pile(x): return x.replace('file', 'pile')
+    def ident(x): return x
 
     files = prepare()
-    check_files( files )
-    with_files( list( files.keys() ), mktmp, pile )
-    check_files( files )
-    check_files( { k + '.tmp': v.replace( 'file', 'pile' )
-                   for k, v in files.items() } )
+    check_files(files)
+    with_files(list(files.keys()), mktmp, pile)
+    check_files(files)
+    check_files({k + '.tmp': v.replace('file', 'pile')
+                 for k, v in files.items()})
 
-def prepare() -> Dict[ str, str ]:
-    data = { 'zt.x': 'this is file zt.x',
-             'zt.y': 'this file is zt.y',
-             'zt.z': 'this is zt.z\n' }
+
+def prepare() -> Dict[str, str]:
+    data = {'zt.x': 'this is file zt.x',
+            'zt.y': 'this file is zt.y',
+            'zt.z': 'this is zt.z\n'}
 
     for fn, content in data.items():
-        with open( fn, 'w' ) as f:
-            f.write( content )
+        with open(fn, 'w') as f:
+            f.write(content)
 
     return data
 
-def check_files( fs: Dict[ str, str ] ) -> None:
+
+def check_files(fs: Dict[str, str]) -> None:
     for name, content in fs.items():
-        assert open( name, 'r' ).read() == content
+        assert open(name, 'r').read() == content
 
 
 if __name__ == '__main__':

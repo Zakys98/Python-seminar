@@ -1,0 +1,19 @@
+
+#
+# /etc/fstab
+# Created by anaconda on Thu Sep 29 16:37:12 2016
+#
+# Accessible filesystems, by reference, are maintained under '/dev/disk'
+# See man pages fstab(5), findfs(8), mount(8) and/or blkid(8) for more info
+#
+UUID=e12b47cf-d174-468d-ac3e-dd25e7327d42 /                       ext4    defaults        1 1
+/dev/mapper/vg_aisa-tmp		/tmp                    ext4    defaults,nosuid,usrjquota=aquota.user,jqfmt=vfsv0        1 2
+/dev/mapper/vg_aisa-mail	/var/spool/mail         ext4    defaults,nosuid,usrjquota=aquota.user,jqfmt=vfsv0        1 2
+/dev/mapper/vg_aisa-vartmp 	/var/tmp                ext4    defaults,nosuid,usrjquota=aquota.user,jqfmt=vfsv0        1 2
+/dev/mapper/vg_aisa-www		/www                    ext4    defaults,nosuid,acl        	1 2
+/dev/mapper/vg_aisa-msgidcache  /var/msgidcache         ext4    defaults,nosuid,noexec		1 2
+/dev/mapper/vg_aisa-riv     /www/riv                ext4    defaults,nosuid    1 2
+/dev/mapper/vg_aisa-webhost /webhost                ext4    defaults,nosuid    1 2
+/dev/mapper/vg_aisa-log     /var/log                ext4    defaults,nosuid,noexec		1 2
+/dev/mapper/vg_aisa-account /var/account            ext4    defaults,nosuid,noexec		1 2
+#/dev/mapper/vg_aisa-swap	swap                    swap    defaults        0 0

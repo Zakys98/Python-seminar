@@ -1,0 +1,6 @@
+aae75c8d6a816625.b none swap sw
+aae75c8d6a816625.a / ffs rw 1 1
+aae75c8d6a816625.d /usr ffs rw,wxallowed,nodev 1 2
+b31cc4c312d35c29.d /home ffs rw,wxallowed,nodev,noatime,softdep,noauto 0 0
+b31cc4c312d35c29.e /var/postgresql ffs rw,nodev,noatime,softdep,noauto 0 0
+aae75c8d6a816625.f /var/obj ffs rw,nodev,softdep,noatime 1 2

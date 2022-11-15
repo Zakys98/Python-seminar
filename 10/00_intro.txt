@@ -1,0 +1,34 @@
+# Databases
+
+This chapter is all about SQL and using relational databases to
+store and query data using Python. We will only look at the ‘bare
+bones’ low level interfaces (things like SQL Alchemy and ORMs are
+topics a little too big to tackle in this small course). We will be
+using SQLite3 in place of a ‘real’ database, but replacing it with
+PostgreSQL or MariaDB or some big commercial database is a question
+of changing a few lines. And then learning a lot of SQL to make good
+use of them.
+
+Demonstrations:
+
+ 1. (to be done)
+
+Prep exercises:
+
+ 1. ‹bimport› – import books into a database
+ 2. ‹bexport› – export books from a database
+ 3. ‹bquery›  – query the book database
+ 4. ‹lcreate› – shopping with Python and SQL
+ 5. ‹lsearch› – retrieve shopping lists from the database
+ 6. ‹lupdate› – update lists in the database
+
+Regular exercises:
+
+ 1. ‹schema›  – create tables given as JSON
+ 2. ‹upgrade› – same, but with schema upgrade
+ 3. ‹pkgs›    – simple queries on a package database
+ 4. ‹depends› – fetching transitive dependencies
+
+Voluntary exercises:
+
+ 1. (nothing here yet)

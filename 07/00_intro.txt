@@ -1,0 +1,63 @@
+# Pitfalls, testing, profiling
+
+This week will cover ‹hypothesis›, a rather useful tool for testing
+Python code. Hypothesis is a «property-based» testing system: unlike
+traditional unit testing, we do not specify exact inputs. Instead,
+we provide a description of an entire class of inputs; ‹hypothesis›
+then randomly samples the space of all inputs in that class,
+invoking our test cases for each such sample.
+
+The main interface to hypothesis is the ‹hypothesis.given›
+decorator. It is used like this:
+
+    import hypothesis # python
+    import hypothesis.strategies as s
+    
+    @hypothesis.given( s.lists( s.integers() ) )
+    def test_sorted( x ):
+        assert sorted( x ) == x # should fail
+    
+    @hypothesis.given( x = s.integers(), y = s.integers() )
+    def test_cancel( x, y ):
+        assert ( x + y ) - y == x # looks okay
+
+Calling the decorated function will perform a number of randomized
+tests. The «strategies» dictate what values will be attempted for
+each argument (arguments and strategies are matched by name).
+
+Demonstrations:
+
+ 1. (to be done)
+
+In practice exercises this week, you will write tests for different
+pieces of (better or worse) code. The ‘tests for the tests’ that are
+enclosed try to make sure your tests can tell bad code from good
+code, though of course there are limitations.
+
+ 1. ‹inner›  – dot product on 3D vectors with integer components
+ 2. ‹cross›  – same, but cross product
+ 3. ‹part›   – partitioning lists based on a predicate
+ 4. ‹search› – binary search, an off-by-one bonanza
+ 5. ‹sort›   – sorting lists
+ 6. ‹heap›   – tests for heap-organized arrays
+
+Unlike other weeks, we will not be writing new programs in the
+seminar either. Instead, you get the following programs that are
+already written and your task is to write tests for them, to make
+sure they are correct (or find and fix bugs if they aren't).
+
+The rules for activity points will be relaxed, so that you can split
+into subgroups and compete with each other to decide the correctness
+of as many programs as you can. Your tutor will arrange the details
+with you.
+
+ 1. ‹life›      – game of life
+ 2. ‹dfs›       – depth first search, the perennial favourite
+ 3. ‹record›    – a decorator for making record types
+ 4. ‹bipartite› – checking whether a graph is bipartite
+ 5. ‹treap›     – testing data structures
+ 6. ‹itree›     – an in-order tree iterator
+
+Voluntary exercises:
+
+ 1. (nothing here yet)

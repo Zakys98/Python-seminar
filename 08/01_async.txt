@@ -1,0 +1,109 @@
+## ‹async› Coroutines
+
+We have already dealt with generators (aka ‘semi-coroutines’) and
+how to extend them to full coroutines using a trampoline. Python has
+another system of coroutines that is related, but in some sense more
+restricted. The main use case for ‹async› coroutines is asynchronous
+IO (we will look at that more specifically in a few weeks) and the
+syntax is tailored to this use case.
+
+When using generators¹, we are mainly interested in ‹yield› and
+extracting the values that were passed to ‹yield› (mainly through
+iteration, sometimes through direct calls to ‹next› or ‹send›). The
+return value of a generator is usually ignored (after all, the only
+way to get this return value is to catch ‹StopIteration›).
+
+In some sense, ‹async def› and particularly ‹await› is the polar
+opposite. In ‹x = await y›, the ‹x› is the «return value» of the
+coroutine object ‹y›. Or to be more specific:
+
+    async def foo():                                # python
+        return 3
+    
+    async def bar():
+        x = await foo() # x is set to 3 here
+
+On the other hand, using the ‹async def› syntax, there is no way to
+yield anything, even though internally, coroutine objects created by
+‹async def› are very similar to generators. The entire interaction
+with ‹yield› and the mechanics of ‹next› and ‹StopIteration› are
+hidden in the ‹await› expression (and in the scheduler – more on
+that in the next section).
+
+Before we go on, let us recall the distinction between generator
+objects and generator functions (and their relationship to lexical
+closures). Given:
+
+    def foo():                                      # python
+        yield 3
+
+‹foo› itself is a generator «function», the result of calling
+‹foo()› is a generator «object» and calling ‹__next__› on this
+object actually runs the code written in ‹foo› (until it yields).
+
+Unsurprisingly, ‹async def› works the same way, though the result is
+not called a generator object but a coroutine object, and there is
+one more twist: you cannot directly call ‹__next__› on a coroutine
+object (i.e. it is not an ‹Iterator›). Instead, it is ‹Awaitable›,
+which means you first need to call ‹__await__› on it, and «that»
+gives you an iterator. Like this:
+
+    async def foo():                                # python
+        return 3
+    
+    coro_awaitable = foo()
+    coro_iterator = coro_awaitable.__await__()
+    next( coro_iterator ) # raises StopIteration( 3 )
+
+Knowing this, we can unpack what the common construct ‹x = await
+foo()› actually means:
+
+    foo_awaitable = foo()                           # python
+    foo_iterator  = foo_awaitable.__await__()
+    
+    try:
+        while True:
+            yield next(foo_iterator)
+    except StopIteration as e:
+        x = e.value
+
+Besides the awaitable/iterator dance (which is just a technicality),
+what happens is that ‹await› transparently passes through every
+‹yield› from the callee to the caller. That is, given:
+
+    async def async_1():                            # python
+        return await magic_sleep(0)
+    
+    async def async_2():
+        return await async_1()
+    
+    async def async_3():
+        return await async_2()
+
+If a ‹return› happens, the callee grabs that value and uses it as
+the result of the ‹await› expression.
+
+However, if ‹magic_sleep› yields (which its real-world equivalents
+normally do), the ‹await› in ‹async_1› takes the value yielded by
+the callee (‹magic_sleep›) and passes it to its caller (‹async_2›).
+Same process repeats in ‹async_2›, which takes the value that
+‹async_1› secretly yielded and passes it onto its own caller,
+‹async_3›.
+
+Basically, ‹async def› coroutines form a stack, which is sandwiched
+between two magic pieces:
+
+ 1. at the top, a magic (library-provided) function which can
+    ‹yield›¹,
+ 2. at the bottom, a «scheduler», which is the piece that actually
+    calls ‹next› (or rather ‹send›) and is what we are going to look
+    at next.
+
+¹ And ‘normal’ coroutines – to avoid confusion, we will call them
+  generators in this unit, though everything said about generators
+  applies equally to normal coroutines.
+² You cannot use ‹yield› in an ‹async def›, or rather, it does not
+  mean what you would expect – what you instead get is an async
+  iterator, which you can use with ‹async for›… so let's ignore that
+  for the moment – the answer is of course hidden in the ‹__await__›
+  dunder method.

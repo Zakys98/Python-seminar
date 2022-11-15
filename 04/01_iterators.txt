@@ -1,0 +1,84 @@
+## Iterators
+
+Of the two concepts in this unit, iterators are by far the simpler.
+An iterator is, conceptually, a ‘finger’ that points at a particular
+element of a ‘sequence’ (you could say ‘pointer’ instead of ‘finger’,
+but that is an already wildly overloaded term).
+
+Further, there are two more concepts with the same root as
+‘iterator’, and that are closely related to them:
+
+ 1. «iterables», which are objects that can be iterated – you could
+    perhaps call them sequences, but iterable is more general (we
+    will get to it),
+ 2. «to iterate» [an iterable ‹x›], which means to create an iterator
+    for ‹x› and then use it (usually until it is exhausted, but not
+    necessarily).
+
+The three elementary operations on an «iterator» are:
+
+ 1. check whether there are any items left in the sequence,
+ 2. shift to the next item,
+ 3. get the current item.
+
+All three are actually implemented as a single operation in Python,
+called ‹next›. It has these effects:
+
+ 1. check whether the sequence is empty, and if so, raise
+    ‹StopIteration› (yes, really),
+ 2. grab the current item (the sequence is not empty, so there is
+    one) so that it can be returned later,
+ 3. shift the ‘finger’ to the next element (mutating the iterator),
+ 4. return the value grabbed in step 2.
+
+This essentially tells you everything that you need to know about
+iterators to use them directly (call ‹next› repeatedly to get items
+and shift the iterator, until it raises ‹StopIteration›). However,
+an overwhelming majority of iterator uses are, in Python, «implicit»
+– either in a ‹for› loop:
+
+    for value in iterable:                      # python
+        pass
+
+or passed as an argument to a (library, builtin) function which
+consumes the «iterable» (e.g. ‹list›, ‹sorted›, ‹map›, ‹sum› and so
+on). You may notice that the results of many of those are in turn
+also iterable.
+
+Notice the distinction between «iterator» and «iterable»: in Python,
+every iterator is an iterable, but the converse is not true: a
+‹list› is iterable but is not an iterator – ‹next([1])› is an error.
+To get an iterator for an iterable, you need to use the built-in
+function ‹iter› – ‹next(iter([1]))› works and evaluates to ‹1›.¹
+Notice that the call to ‹iter› is implicit in a ‹for› loop (i.e. you
+can really use an iterable that is not an iterator – probably quite
+obviously, since you can use ‹for› to iterate a ‹list›).
+
+When using iterators, one additional property needs to be kept in
+mind – there are two flavours of iterables:
+
+ 1. ‘one shot’ iterables, which are consumed by iterating over them,
+    and hence can be iterated at most once (you could call them
+    «streams»),
+ 2. ‘restartable’ iterables, which can be iterated multiple times
+    (these are what we normally think of as «sequences»).
+
+By convention, one-shot iterables are their own iterators (as in,
+the iterator is literally the «same object» – not a different
+instance of the same class), though this is not required. In a
+complementary convention, iterators are one-shot iterables (recall
+that each iterator must be also an iterable), even when they are
+derived from a restartable iterable:
+
+    i = iter( [1, 2] )     # list is restartable         # python
+    j = iter( i )          # list_iterator is one-shot
+    assert next( i ) == 1
+    assert next( j ) == 2
+    next( i )             # StopIteration
+
+Additional technical details can be found in the demos (including a
+short ‘how to write an iterator’ tutorial).
+
+¹ Both ‹iter› and ‹next› simply delegate to the methods ‹__iter__›
+  and ‹__next__› of the object they are called on. We will see this
+  when we implement our own iterables and iterators.

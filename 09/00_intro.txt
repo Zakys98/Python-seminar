@@ -1,0 +1,33 @@
+# Text, JSON
+
+This chapter will focus on working with text and structured textual
+data (JSON and related formats, such as YAML and TOML). We will look
+at both writing parsers ‘from scratch’ (using both regular
+expressions and recursive descent), but also using parsing libraries
+(the ‹json› and ‹csv› modules) and working with binary data.
+
+Demonstrations:
+
+ 1. (to be done)
+
+Practice exercises:
+
+ 1. ‹grep›     – match regular expressions against text files
+ 2. ‹magic›    – identify file type by content
+ 3. ‹report›   – parse JSON and print human-readable output
+ 4. ‹elements› – convert CSV to JSON
+ 5. ‹mueval›   – evaluate LISPy (prefix) expressions
+ 6. ‹flatten›  – convert JSON to TOML(-ish)
+
+Regular exercises:
+
+ 1. ‹email›    – parsing e-mails the simple way
+ 2. ‹toml›     – recursive descent and INI files
+ 3. ‹resolv›   – parse a simplified ‹resolv.conf›
+ 4. ‹fstab›    – read and parse ‹/etc/fstab›
+ 5. ‹yaml›     – convert JSON to (readable) YAML
+ 6. ‹cpp›      – a simplified C preprocessor
+
+Voluntary exercises:
+
+ 1. (nothing here yet)

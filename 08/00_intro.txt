@@ -1,0 +1,33 @@
+# Coroutines 2, ‹async def›
+
+This chapter extends what we know about coroutines and generators to
+include ‹async› coroutines, how they are used, how they are related
+to generators and how they ‘tick’ in general.
+
+Demonstrations:
+
+ 1. ‹request›  – communication with the scheduler
+ 2. ‹fibres›   – how to schedule fibres (aka green threads)
+ 3. ‹spawn›    – creating new fibres on demand
+ 4. ‹yield›    – asynchronous generators and ‹async for›
+ 5. ‹context›  – context managers and ‹async›
+
+Practice exercises:
+
+ 1. ‹rrsched›  – a round-robin coroutine scheduler
+ 2. ‹priority› – a simple priority-driven scheduler
+ 3. ‹exchange› – coordinate ‹async› producers and consumers
+ 4. ‹box›      – a simplified version of the above
+ 5. (exercise missing)
+ 6. ‹sort›     – sorting with real-time latency constraints
+
+Regular exercises:
+
+ 1. ‹sleep›    – planning execution of sleepy coroutines
+ 2. ‹ioplex›   – multiplex incoming IO to multiple coroutines
+ 3. ‹search›   – low-latency binary search trees
+ 4. (3 more exercises missing)
+
+Voluntary exercises:
+
+ 1. (nothing here yet either)
